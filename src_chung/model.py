@@ -136,16 +136,16 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
         r_graph_feats_attetion=r_graph_feats
 
-        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
 
@@ -177,7 +177,7 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
 
-    n_epochs = 2
+    n_epochs = 15
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
     # lr_scheduler = MultiStepLR(
@@ -239,12 +239,9 @@ def training(
 
             
             print(
-                "--- training epoch %d, lr %f, processed %d/%d, loss %.3f, acc %.3f, mcc %.3f, time elapsed(min) %.2f"
+                "--- training epoch %d, loss %.3f, acc %.3f, mcc %.3f, time elapsed(min) %.2f"
                 % (
                     epoch,
-                    optimizer.param_groups[-1]["lr"],
-                    train_size,
-                    train_size,
                     np.mean(train_loss_list),
                     acc,
                     mcc,
