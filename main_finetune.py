@@ -6,8 +6,8 @@ import pandas as pd
 import torch
 from rdkit import rdBase
 
-from get_reaction_data import get_graph_data
-from finetune import finetune
+from sample.src_chung.get_reaction_data import get_graph_data
+from sample.src_chung.finetune import finetune
 
 rdBase.DisableLog("rdApp.error")
 rdBase.DisableLog("rdApp.warning")

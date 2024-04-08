@@ -5,9 +5,9 @@ from dgl.data.utils import split_dataset
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 from scipy import stats
 
-from model import reactionMPNN, training, inference
-from dataset import GraphDataset
-from util import collate_reaction_graphs
+from src_chung.model import reactionMPNN, training, inference
+from src_chung.dataset import GraphDataset
+from src_chung.util import collate_reaction_graphs
 
 # data_id -> #data_id 1: Buchwald-Hartwig, #data_id 2: Suzuki-Miyaura, %data_id 3: out-of-sample test splits for Buchwald-Hartwig
 # split_id -> #data_id 1 & 2: 0-9, data_id 3: 1-4
@@ -18,7 +18,7 @@ def finetune(args):
 
     batch_size = 32
     use_saved = False
-    model_path = "../data_chung/model/finetuned/model.pt"
+    model_path = "/kaggle/working/sample/data_chung/model/finetuned/model.pt"
 
     data_train = GraphDataset(args.graph_save_path+'data_train.npz')
     train_set, val_set = split_dataset(
@@ -65,7 +65,7 @@ def finetune(args):
     node_dim = data_train.rmol_node_attr[0].shape[1]
     edge_dim = data_train.rmol_edge_attr[0].shape[1]
 
-    pretrained_model_path = "../model/pretrained/" + "27407_pretrained_gnn.pt" 
+    pretrained_model_path = "/kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
 
     net = reactionMPNN(node_dim, edge_dim, pretrained_model_path).cuda()
 
