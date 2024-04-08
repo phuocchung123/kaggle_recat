@@ -67,7 +67,7 @@ class MultiHeadAttention(nn.Module):
         # Attention analyse
         #        csvwriter = csv.writer(open("attention.csv","a+",newline=""))
 
-        temp = x.cpu().numpy()
+        temp = x.detach().numpy()
         #        temp = temp.argmax(axis = 2)
         temp = temp.mean(axis=2)
 #        print(temp.shape)
