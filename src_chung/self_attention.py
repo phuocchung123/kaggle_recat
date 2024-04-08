@@ -63,6 +63,7 @@ class MultiHeadAttention(nn.Module):
         if attn_bias is not None:
             x = x + attn_bias
         x = torch.softmax(x, dim=3)
+        print(x.size())
         #
         # Attention analyse
         #        csvwriter = csv.writer(open("attention.csv","a+",newline=""))
@@ -80,11 +81,14 @@ class MultiHeadAttention(nn.Module):
         #        csvwriter.writerows(temp.tolist())
         x = self.att_dropout(x)
         x = x.matmul(v)  # [b, h, q_len, attn]
+        print(x.size())
         
         x = x.transpose(1, 2).contiguous()  # [b, q_len, h, attn]
+        print(x.size())
         x = x.view(batch_size, -1, self.num_heads * d_v)
-        
+        print(x.size())
         x = self.output_layer(x)
+        print(x.size())
         
         print(x.size())
         print(orig_q_size)
