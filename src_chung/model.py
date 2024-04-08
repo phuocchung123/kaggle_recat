@@ -136,8 +136,8 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
@@ -146,10 +146,10 @@ class reactionMPNN(nn.Module):
         # print(p_graph_feats.shape)
         r_graph_feats_attetion=r_graph_feats
 
-        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        # print(r_graph_feats.shape)
-        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
-        # print(p_graph_feats.shape)
+        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        # # print(r_graph_feats.shape)
+        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        # # print(p_graph_feats.shape)
 
 
         concat_feats = torch.sub(r_graph_feats, p_graph_feats)
