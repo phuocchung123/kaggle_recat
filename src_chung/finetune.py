@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import csv, os
 from torch.utils.data import DataLoader
 from dgl.data.utils import split_dataset
@@ -77,12 +78,14 @@ def finetune(args):
         pass
 
     # inference
-
     test_y = test_loader.dataset.y
+    test_y=test_y.to_list()
+
 
     test_y_pred = inference(
         net, test_loader,
     )
+    test_y_pred=torch.argmax(test_y_pred, dim=1).tolist()    
 
 
     result = [

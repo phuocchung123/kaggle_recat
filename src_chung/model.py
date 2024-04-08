@@ -277,7 +277,7 @@ def training(
 
 
                     pred_val=net(inputs_rmol, inputs_pmol)
-                    val_preds.extend(torch.argmax(pred, dim=1).tolist())    
+                    val_preds.extend(torch.argmax(pred_val, dim=1).tolist())    
                     loss=loss_fn(pred_val,labels_val)
 
                     val_loss = loss.item()
