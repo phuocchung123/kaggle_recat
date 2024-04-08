@@ -272,7 +272,7 @@ def training(
                     ]
 
                     labels_val = batchdata[-1]
-                    val_targets.extend(labels.tolist())
+                    val_targets.extend(labels_val.tolist())
                     labels_val = labels_val.to(cuda)
 
 
