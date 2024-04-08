@@ -61,6 +61,7 @@ class MultiHeadAttention(nn.Module):
         # Scaled Dot-Product Attention.
         # Attention(Q, K, V) = softmax((QK^T)/sqrt(d_k))V
         q = q * self.scale
+        print('q ',q.size())
         x = torch.matmul(q, k)  # [b, h, q_len, k_len]
         if attn_bias is not None:
             x = x + attn_bias
