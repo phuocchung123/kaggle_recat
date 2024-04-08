@@ -79,7 +79,7 @@ def finetune(args):
 
     # inference
     test_y = test_loader.dataset.y
-    test_y=test_y.to_list()
+    test_y=test_y.tolist()
 
 
     test_y_pred = inference(
