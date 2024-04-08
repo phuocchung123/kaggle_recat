@@ -77,25 +77,25 @@ def finetune(args):
     else:
         pass
 
-    # inference
-    test_y = test_loader.dataset.y
-    test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
+    # # inference
+    # test_y = test_loader.dataset.y
+    # test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
 
 
-    test_y_pred = inference(
-        net, test_loader,
-    )
-    # test_y_pred=torch.argmax(torch.Tensor(test_y_pred), dim=1).tolist()    
+    # test_y_pred = inference(
+    #     net, test_loader,
+    # )
+    # # test_y_pred=torch.argmax(torch.Tensor(test_y_pred), dim=1).tolist()    
 
 
-    result = [
-        accuracy_score(test_y, test_y_pred),
-        matthews_corrcoef(test_y, test_y_pred),
-    ]
+    # result = [
+    #     accuracy_score(test_y, test_y_pred),
+    #     matthews_corrcoef(test_y, test_y_pred),
+    # ]
 
-    print("-- RESULT")
-    print("--- test size: %d" % (len(test_y)))
-    print(
-        "--- Accuracy: %.3f, Mattews Correlation: %.3f"
-        % (result[0], result[1],)
-    )
+    # print("-- RESULT")
+    # print("--- test size: %d" % (len(test_y)))
+    # print(
+    #     "--- Accuracy: %.3f, Mattews Correlation: %.3f"
+    #     % (result[0], result[1],)
+    # )
