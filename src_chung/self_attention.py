@@ -86,6 +86,8 @@ class MultiHeadAttention(nn.Module):
         
         x = self.output_layer(x)
         
+        print(x.size())
+        print(orig_q_size)
         assert x.size() == orig_q_size
         return x
 
