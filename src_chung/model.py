@@ -329,6 +329,8 @@ def inference(
             ]
             pred=net(inputs_rmol, inputs_pmol)
 
-            pred_y.append(pred.cpu().numpy())
+            # pred_y.append(pred.cpu().numpy())
+            pred_y.extend(torch.argmax(pred_y,dim=1).tolist())
+            # val_preds.extend(torch.argmax(pred_val, dim=1).tolist()) 
 
     return pred_y
