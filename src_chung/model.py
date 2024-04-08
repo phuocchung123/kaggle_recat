@@ -136,16 +136,16 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        # self.rea_attention_pro = EncoderLayer(128, 0.1, 0.1, 2)  # 注意力机制
-        # self.pro_attention_rea = EncoderLayer(128, 0.1, 0.1, 2)
+        self.rea_attention_pro = EncoderLayer(128, 0.1, 0.1, 2)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(128, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
         r_graph_feats_attetion=r_graph_feats
 
-        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
 
@@ -177,7 +177,7 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
 
-    n_epochs = 5
+    n_epochs = 2
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
     # lr_scheduler = MultiStepLR(
@@ -311,16 +311,16 @@ def training(
 
     #visualize
 
-    sns.set()
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-    sns.lineplot(data=train_loss_all, label='train', ax=axes[0]).set(title='Loss')
-    sns.lineplot(data=val_loss_all, label='valid', ax=axes[0])
-    # plot acc learning curves
-    sns.lineplot(data=acc_all, label='train', ax=axes[1]).set(title='Accuracy')
-    sns.lineplot(data=acc_all_val, label='valid', ax=axes[1])
-    # plot mcc learning curves
-    sns.lineplot(data=mcc_all, label='train', ax=axes[2]).set(title='Matthews Correlation Coefficient')
-    sns.lineplot(data=mcc_all_val, label='valid', ax=axes[2])
+    # sns.set()
+    # fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    # sns.lineplot(data=train_loss_all, label='train', ax=axes[0]).set(title='Loss')
+    # sns.lineplot(data=val_loss_all, label='valid', ax=axes[0])
+    # # plot acc learning curves
+    # sns.lineplot(data=acc_all, label='train', ax=axes[1]).set(title='Accuracy')
+    # sns.lineplot(data=acc_all_val, label='valid', ax=axes[1])
+    # # plot mcc learning curves
+    # sns.lineplot(data=mcc_all, label='train', ax=axes[2]).set(title='Matthews Correlation Coefficient')
+    # sns.lineplot(data=mcc_all_val, label='valid', ax=axes[2])
 
     print("training terminated at epoch %d" % epoch)
     torch.save(net.state_dict(), model_path)
