@@ -7,6 +7,8 @@ from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
 from dgl.nn.pytorch.glob import AvgPooling
 from sklearn.metrics import accuracy_score, matthews_corrcoef
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # from util import MC_dropout
 from src_chung.self_attention import EncoderLayer
@@ -30,7 +32,7 @@ class GIN(nn.Module):
         self,
         node_in_feats,
         edge_in_feats,
-        depth=6,
+        depth=2,
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
@@ -175,12 +177,19 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
 
-    n_epochs = 20
+    n_epochs = 5
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
     # lr_scheduler = MultiStepLR(
     #     optimizer, milestones=[400, 450], gamma=0.1, verbose=False
     # )
+
+    train_loss_all=[]
+    val_loss_all=[]
+    acc_all=[]
+    acc_all_val=[]
+    mcc_all=[]
+    mcc_all_val=[]
 
     for epoch in range(n_epochs):
         # training
@@ -221,6 +230,9 @@ def training(
 
         acc = accuracy_score(targets, preds)
         mcc = matthews_corrcoef(targets, preds)
+        train_loss_all.append(np.mean(train_loss_list))
+        acc_all.append(acc)
+        mcc_all.append(mcc)
 
 
         if (epoch + 1) % 1 == 0:
@@ -286,12 +298,29 @@ def training(
                 val_acc = accuracy_score(val_targets, val_preds)
                 val_mcc = matthews_corrcoef(val_targets, val_preds)
 
+                val_loss_all.append(np.mean(val_loss_list))
+                acc_all_val.append(val_acc)
+                mcc_all_val.append(val_mcc)
+
 
 
                 print(
                     "--- validation at epoch %d, val_loss %.3f, val_acc %.3f, val_mcc %.3f ---"
                     % (epoch, np.mean(val_loss_list),val_acc,val_mcc)
                 )
+
+    #visualize
+
+    sns.set()
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    sns.lineplot(data=train_loss_all, label='train', ax=axes[0]).set(title='Loss')
+    sns.lineplot(data=val_loss_all, label='valid', ax=axes[0])
+    # plot acc learning curves
+    sns.lineplot(data=acc_all, label='train', ax=axes[1]).set(title='Accuracy')
+    sns.lineplot(data=acc_all_val, label='valid', ax=axes[1])
+    # plot mcc learning curves
+    sns.lineplot(data=mcc_all, label='train', ax=axes[2]).set(title='Matthews Correlation Coefficient')
+    sns.lineplot(data=mcc_all_val, label='valid', ax=axes[2])
 
     print("training terminated at epoch %d" % epoch)
     torch.save(net.state_dict(), model_path)
