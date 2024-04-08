@@ -85,7 +85,7 @@ def finetune(args):
     test_y_pred = inference(
         net, test_loader,
     )
-    test_y_pred=torch.argmax(test_y_pred, dim=1).tolist()    
+    test_y_pred=torch.argmax(torch.Tensor(test_y_pred), dim=1).tolist()    
 
 
     result = [
