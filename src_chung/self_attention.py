@@ -84,7 +84,7 @@ class MultiHeadAttention(nn.Module):
         #        csvwriter.writerows(temp.tolist())
         x = self.att_dropout(x)
         x = x.matmul(v)  # [b, h, q_len, attn]
-        print(x.size())
+        # print(x.size())
         
         x = x.transpose(1, 2).contiguous()  # [b, q_len, h, attn]
         # print(x.size())
