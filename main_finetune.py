@@ -8,9 +8,12 @@ from rdkit import rdBase
 
 from src_chung.get_reaction_data import get_graph_data
 from src_chung.finetune import finetune
+import warnings
 
 rdBase.DisableLog("rdApp.error")
 rdBase.DisableLog("rdApp.warning")
+
+warnings.filterwarnings('ignore') 
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
