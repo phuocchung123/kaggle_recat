@@ -33,7 +33,7 @@ class GIN(nn.Module):
         self,
         node_in_feats,
         edge_in_feats,
-        depth=3,
+        depth=2,
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
@@ -138,16 +138,16 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        # self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
-        # self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
+        self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
         r_graph_feats_attetion=r_graph_feats
 
-        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
         concat_feats = torch.cat([r_graph_feats, p_graph_feats],1)
