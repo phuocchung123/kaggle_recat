@@ -128,7 +128,7 @@ class reactionMPNN(nn.Module):
             print("Successfully loaded pretrained model!")
 
         self.predict = nn.Sequential(
-            nn.Linear(2*readout_feats, predict_hidden_feats),
+            nn.Linear(readout_feats, predict_hidden_feats),
             nn.PReLU(),
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, predict_hidden_feats),
@@ -138,19 +138,19 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        # self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 2)  # 注意力机制
-        # self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 2)
+        self.rea_attention_pro = EncoderLayer(1024, 0.1, 0.1, 32)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(1024, 0.1, 0.1, 32)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
         r_graph_feats_attetion=r_graph_feats
 
-        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
-        concat_feats = torch.cat([r_graph_feats, p_graph_feats],1)
+        concat_feats = torch.sub(r_graph_feats, p_graph_feats)
         out = self.predict(concat_feats)
 
         return out
@@ -312,6 +312,7 @@ def training(
                     "--- validation at epoch %d, val_loss %.3f, val_acc %.3f, val_mcc %.3f ---"
                     % (epoch, np.mean(val_loss_list),val_acc,val_mcc)
                 )
+                print('\n'+'*'*100)
 
     #visualize
 
