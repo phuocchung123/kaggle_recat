@@ -9,6 +9,7 @@ from dgl.nn.pytorch.glob import AvgPooling
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 import seaborn as sns
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 # from util import MC_dropout
 from src_chung.self_attention import EncoderLayer
@@ -202,7 +203,7 @@ def training(
         preds=[]
 
 
-        for batchidx, batchdata in enumerate(train_loader):
+        for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
             inputs_pmol = [
                 b.to(cuda)
@@ -274,7 +275,7 @@ def training(
 
 
             with torch.no_grad():
-                for batchidx, batchdata in enumerate(val_loader):
+                for batchdata in tqdm(val_loader, desc='Validating'):
                     inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
                     inputs_pmol = [
                         b.to(cuda)
@@ -353,7 +354,7 @@ def inference(
     pred_y = []
 
     with torch.no_grad():
-        for batchidx, batchdata in enumerate(test_loader):
+        for batchdata in tqdm(test_loader, desc='Testing'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
             inputs_pmol = [
                 b.to(cuda)
