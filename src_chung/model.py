@@ -110,7 +110,7 @@ class reactionMPNN(nn.Module):
         self,
         node_in_feats,
         edge_in_feats,
-        pretrained_model_path,
+        pretrained_model_path=None,
         readout_feats=1024,
         predict_hidden_feats=512,
         prob_dropout=0.1,
@@ -118,12 +118,13 @@ class reactionMPNN(nn.Module):
         super(reactionMPNN, self).__init__()
 
         self.mpnn = GIN(node_in_feats, edge_in_feats)
-        state_dict = torch.load(
-            pretrained_model_path,
-            map_location='cuda:0',
-        )
-        self.mpnn.load_my_state_dict(state_dict)
-        print("Successfully loaded pretrained model!")
+        if pretrained_model_path is not None:
+            state_dict = torch.load(
+                pretrained_model_path,
+                map_location='cuda:0',
+            )
+            self.mpnn.load_my_state_dict(state_dict)
+            print("Successfully loaded pretrained model!")
 
         self.predict = nn.Sequential(
             nn.Linear(2*readout_feats, predict_hidden_feats),
