@@ -190,6 +190,7 @@ def training(
     mcc_all=[]
     mcc_all_val=[]
 
+    best_val_loss =1e10
     for epoch in range(n_epochs):
         # training
         net.train()
@@ -291,8 +292,13 @@ def training(
                     val_loss = loss.item()
                     val_loss_list.append(val_loss)
 
+                if np.mean(val_loss_list) < best_val_loss:
+                    best_val_loss = np.mean(val_loss_list)
+                    torch.save(net.state_dict(), model_path)
+
                 val_acc = accuracy_score(val_targets, val_preds)
                 val_mcc = matthews_corrcoef(val_targets, val_preds)
+
 
                 val_loss_all.append(np.mean(val_loss_list))
                 acc_all_val.append(val_acc)
@@ -319,7 +325,7 @@ def training(
     # sns.lineplot(data=mcc_all_val, label='valid', ax=axes[2])
 
     print("training terminated at epoch %d" % epoch)
-    torch.save(net.state_dict(), model_path)
+    # torch.save(net.state_dict(), model_path)
 
     return net
 
