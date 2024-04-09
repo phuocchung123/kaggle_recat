@@ -32,7 +32,7 @@ class GIN(nn.Module):
         self,
         node_in_feats,
         edge_in_feats,
-        depth=6,
+        depth=2,
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
@@ -176,7 +176,7 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
 
-    n_epochs = 15
+    n_epochs = 2
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
     # lr_scheduler = MultiStepLR(
