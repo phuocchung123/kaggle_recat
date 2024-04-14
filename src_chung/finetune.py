@@ -58,7 +58,7 @@ def finetune(args):
     print("--- model_path:", model_path)
 
     # training
-    train_y = train_loader.dataset.dataset.y[train_loader.dataset.indices]
+    train_y = train_loader.dataset.y
 
     assert len(train_y) == len(train_set)
 
