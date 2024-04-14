@@ -4,6 +4,7 @@ from rdkit import Chem
 from src_chung.preprocess_util import add_mol, add_dummy, dict_list_to_numpy
 
 
+
 def mol_dict():
     return {
         "n_node": [],
