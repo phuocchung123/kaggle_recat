@@ -150,8 +150,8 @@ class reactionMPNN(nn.Module):
         # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
-        concat_feats = torch.sub(r_graph_feats, p_graph_feats)
-        out = self.predict(concat_feats)
+        # concat_feats = torch.sub(r_graph_feats, p_graph_feats)
+        # out = self.predict(concat_feats)
 
         return r_graph_feats
 
