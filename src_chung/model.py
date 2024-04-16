@@ -128,7 +128,7 @@ class reactionMPNN(nn.Module):
             print("Successfully loaded pretrained model!")
 
         self.predict = nn.Sequential(
-            nn.Linear(readout_feats, predict_hidden_feats),
+            nn.Linear(2*readout_feats, predict_hidden_feats),
             nn.PReLU(),
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, predict_hidden_feats),
