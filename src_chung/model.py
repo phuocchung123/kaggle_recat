@@ -385,7 +385,10 @@ def inference(
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
-            pred=net(inputs_rmol, inputs_pmol)
+            r_rep,p_rep= net(inputs_rmol, inputs_pmol)
+
+            pred = net.predict(torch.sub(r_rep,p_rep))
+
 
             # pred_y.append(pred.cpu().numpy())
             pred_y.extend(torch.argmax(pred,dim=1).tolist())
