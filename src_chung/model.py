@@ -294,9 +294,13 @@ def training(
                     labels_val = labels_val.to(cuda)
 
 
-                    pred_val=net(inputs_rmol, inputs_pmol)
+                    r_rep,p_rep=net(inputs_rmol, inputs_pmol)
+                    loss_sc=nt_xent_criterion(r_rep, p_rep)
+                    pred_val = net.predict(torch.sub(r_rep,p_rep))
                     val_preds.extend(torch.argmax(pred_val, dim=1).tolist())    
-                    loss=loss_fn(pred_val,labels_val)
+                    loss_ce=loss_fn(pred_val,labels_val)
+
+                    loss=loss_sc + loss_ce
 
                     val_loss = loss.item()
                     val_loss_list.append(val_loss)
