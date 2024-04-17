@@ -204,6 +204,17 @@ def training(
         targets=[]
         preds=[]
 
+        # Generate two random numbers
+        num1 = torch.rand(1).item()
+        num2 = torch.rand(1).item()
+
+        # Calculate the total
+        total = num1 + num2
+
+        # Calculate the percentage of each number
+        weight1 = (num1 / total) * 100
+        weight2 = (num2 / total) * 100
+
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
@@ -222,7 +233,7 @@ def training(
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
             loss_ce = loss_fn(pred, labels)
-            loss=loss_ce+loss_sc
+            loss=weight1*loss_ce+weight2*loss_sc
 
             ##Uncertainty 
             # loss = (1 - 0.1) * loss.mean() + 0.1 * (
@@ -300,7 +311,7 @@ def training(
                     val_preds.extend(torch.argmax(pred_val, dim=1).tolist())    
                     loss_ce=loss_fn(pred_val,labels_val)
 
-                    loss=loss_sc + loss_ce
+                    loss=weight1*loss_ce+weight2*loss_sc
 
                     val_loss = loss.item()
                     val_loss_list.append(val_loss)
