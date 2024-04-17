@@ -129,7 +129,7 @@ class reactionMPNN(nn.Module):
             print("Successfully loaded pretrained model!")
 
         self.predict = nn.Sequential(
-            nn.Linear(2*readout_feats, predict_hidden_feats),
+            nn.Linear(readout_feats, predict_hidden_feats),
             nn.PReLU(),
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, predict_hidden_feats),
@@ -151,10 +151,10 @@ class reactionMPNN(nn.Module):
         p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
-        concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
-        out = self.predict(concat_feats)
+        # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
+        # out = self.predict(concat_feats)
 
-        return out
+        return r_graph_feats, p_graph_feats
 
 
 def training(
@@ -216,10 +216,12 @@ def training(
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
 
-            pred= net(inputs_rmol, inputs_pmol)
+            r_rep,p_rep= net(inputs_rmol, inputs_pmol)
+            loss_sc=nt_xent_criterion(r_rep, p_rep)
+
+            pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
             loss_ce = loss_fn(pred, labels)
-            loss_sc = nt_xent_criterion(inputs_rmol, inputs_pmol)
             loss=loss_ce+loss_sc
 
             ##Uncertainty 
