@@ -212,8 +212,8 @@ def training(
         total = num1 + num2
 
         # Calculate the percentage of each number
-        weight1 = (num1 / total) * 100
-        weight2 = (num2 / total) * 100
+        weight1 = (num1 / total)
+        weight2 = (num2 / total)
 
 
         for batchdata in tqdm(train_loader, desc='Training'):
