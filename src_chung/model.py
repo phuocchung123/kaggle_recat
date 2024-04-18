@@ -212,11 +212,10 @@ def training(
             inputs_rmol.extend(input_rmol)
             inputs_pmol.extend(input_pmol)
         
-        inputs_rmol=[F.normalize(i,dim=1) for i in inputs_rmol]
-        inputs_pmol=[F.normalize(i,dim=1) for i in inputs_pmol]
-
-
         r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+        
+        r_rep=F.normalize(r_rep, dim=1)
+        p_rep=F.normalize(p_rep, dim=1)
         loss_sc=nt_xent_criterion(r_rep, p_rep)
 
         optimizer.zero_grad()
