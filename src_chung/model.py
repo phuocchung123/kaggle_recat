@@ -212,8 +212,8 @@ def training(
             inputs_rmol.extend(input_rmol)
             inputs_pmol.extend(input_pmol)
         
-        # inputs_rmol=torch.stack(inputs_rmol)
-        # inputs_pmol=torch.stack(inputs_pmol)
+        inputs_rmol=torch.tensor(inputs_rmol)
+        inputs_pmol=torch.tensor(inputs_pmol)
 
         inputs_rmol=F.normalize(inputs_rmol,dim=1)
         inputs_pmol=F.normalize(inputs_pmol,dim=1)
