@@ -200,22 +200,26 @@ def training(
         net_contra.train()
         start_time = time.time()
         train_loss_contra_list = []
-        
+
+        inputs_rmol=[]
+        inputs_pmol=[]
         for batchdata in tqdm(train_loader, desc='Training_contra'):
-            inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            inputs_pmol = [
+            input_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+            input_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
-            r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
-            loss_sc=nt_xent_criterion(r_rep, p_rep)
+            inputs_rmol.extend(input_rmol)
+            inputs_pmol.extend(input_pmol)
+        r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+        loss_sc=nt_xent_criterion(r_rep, p_rep)
 
-            optimizer.zero_grad()
-            loss_sc.backward()
-            optimizer.step()
+        optimizer.zero_grad()
+        loss_sc.backward()
+        optimizer.step()
 
-            train_loss_contra = loss_sc.detach().item()
-            train_loss_contra_list.append(train_loss_contra)
+        train_loss_contra = loss_sc.detach().item()
+        train_loss_contra_list.append(train_loss_contra)
 
         print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
             % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
