@@ -212,11 +212,9 @@ def training(
             inputs_rmol.extend(input_rmol)
             inputs_pmol.extend(input_pmol)
         
-        inputs_rmol=torch.tensor(inputs_rmol)
-        inputs_pmol=torch.tensor(inputs_pmol)
+        inputs_rmol=[F.normalize(i,dim=1) for i in inputs_rmol]
+        inputs_pmol=[F.normalize(i,dim=1) for i in inputs_pmol]
 
-        inputs_rmol=F.normalize(inputs_rmol,dim=1)
-        inputs_pmol=F.normalize(inputs_pmol,dim=1)
 
         r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
         loss_sc=nt_xent_criterion(r_rep, p_rep)
