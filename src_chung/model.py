@@ -181,7 +181,7 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
 
-    n_epochs = 20
+    n_epochs = 2
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
@@ -235,19 +235,6 @@ def training(
         targets=[]
         preds=[]
 
-        # # Generate two random numbers
-        # num1 = torch.rand(1).item()
-        # num2 = torch.rand(1).item()
-
-        # # Calculate the total
-        # total = num1 + num2
-
-        # # Calculate the percentage of each number
-        # weight1 = (num1 / total)
-        # weight2 = (num2 / total)
-
-
-
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
             inputs_pmol = [
@@ -295,7 +282,6 @@ def training(
                 )
             )
 
-        # lr_scheduler.step()
 
         # validation with test set
         if val_loader is not None and (epoch + 1) % val_monitor_epoch == 0:
@@ -315,8 +301,6 @@ def training(
             val_targets=[]
             val_preds=[]
 
-            # MC_dropout(net)
-
 
             with torch.no_grad():
                 for batchdata in tqdm(val_loader, desc='Validating'):
@@ -332,12 +316,10 @@ def training(
 
 
                     r_rep,p_rep=net(inputs_rmol, inputs_pmol)
-                    loss_sc=nt_xent_criterion(r_rep, p_rep)
                     pred_val = net.predict(torch.sub(r_rep,p_rep))
                     val_preds.extend(torch.argmax(pred_val, dim=1).tolist())    
-                    loss_ce=loss_fn(pred_val,labels_val)
+                    loss=loss_fn(pred_val,labels_val)
 
-                    loss=weight1*loss_ce+weight2*loss_sc
 
                     val_loss = loss.item()
                     val_loss_list.append(val_loss)
