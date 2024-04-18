@@ -2,6 +2,7 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
@@ -210,6 +211,13 @@ def training(
             ]
             inputs_rmol.extend(input_rmol)
             inputs_pmol.extend(input_pmol)
+        
+        inputs_rmol=torch.stack(inputs_rmol)
+        inputs_pmol=torch.stack(inputs_pmol)
+
+        inputs_rmol=F.normalize(inputs_rmol)
+        inputs_pmol=F.normalize(inputs_pmol)
+
         r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
         loss_sc=nt_xent_criterion(r_rep, p_rep)
 
