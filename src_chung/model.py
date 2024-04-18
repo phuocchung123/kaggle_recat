@@ -228,6 +228,7 @@ def training(
         if np.mean(train_loss_contra_list) < best_loss:
             best_loss = np.mean(train_loss_contra_list)
             net = net_contra
+    print('\n'+'*'*100)
 
     for epoch in range(n_epochs):
         # training
