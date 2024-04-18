@@ -199,7 +199,6 @@ def training(
         # training
         net_contra.train()
         start_time = time.time()
-        train_loss_contra_list = []
 
         inputs_rmol=[]
         inputs_pmol=[]
@@ -219,14 +218,13 @@ def training(
         optimizer.step()
 
         train_loss_contra = loss_sc.detach().item()
-        train_loss_contra_list.append(train_loss_contra)
 
         print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
-            % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
+            % (epoch, train_loss_contra, (time.time() - start_time) / 60))
         
 
-        if np.mean(train_loss_contra_list) < best_loss:
-            best_loss = np.mean(train_loss_contra_list)
+        if train_loss_contra < best_loss:
+            best_loss = np.mean(train_loss_contra)
             net = net_contra
     print('\n'+'*'*100)
 
