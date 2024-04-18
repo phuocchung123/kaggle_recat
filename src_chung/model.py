@@ -205,8 +205,8 @@ def training(
         # inputs_pmol=[]
         train_loss_contra_list=[]
         for batchdata in tqdm(train_loader, desc='Training_contra'):
-            input_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            input_pmol = [
+            inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+            inputs_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
