@@ -169,6 +169,7 @@ def training(
     train_size = train_loader.dataset.__len__()
     batch_size = train_loader.batch_size
     nt_xent_criterion = NTXentLoss(cuda, batch_size)
+    
 
     try:
         rmol_max_cnt = train_loader.dataset.dataset.rmol_max_cnt
@@ -183,9 +184,6 @@ def training(
     n_epochs = 20
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
-    # lr_scheduler = MultiStepLR(
-    #     optimizer, milestones=[400, 450], gamma=0.1, verbose=False
-    # )
 
     train_loss_all=[]
     val_loss_all=[]
@@ -195,8 +193,41 @@ def training(
     mcc_all_val=[]
 
     best_val_loss =1e10
+    best_loss=1e10
+    net_contra = net
     for epoch in range(n_epochs):
         # training
+        net_contra.train()
+        start_time = time.time()
+        train_loss_contra_list = []
+        
+        for batchdata in tqdm(train_loader, desc='Training_contra'):
+            inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+            inputs_pmol = [
+                b.to(cuda)
+                for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
+            ]
+            r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+            loss_sc=nt_xent_criterion(r_rep, p_rep)
+
+            optimizer.zero_grad()
+            loss_sc.backward()
+            optimizer.step()
+
+            train_loss_contra = loss_sc.detach().item()
+            train_loss_contra_list.append(train_loss_contra)
+
+        print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
+            % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
+        
+
+        if np.mean(train_loss_contra_list) < best_loss:
+            best_loss = np.mean(train_loss_contra_list)
+            net = net_contra
+
+    for epoch in range(n_epochs):
+        # training
+
         net.train()
         start_time = time.time()
 
@@ -204,16 +235,17 @@ def training(
         targets=[]
         preds=[]
 
-        # Generate two random numbers
-        num1 = torch.rand(1).item()
-        num2 = torch.rand(1).item()
+        # # Generate two random numbers
+        # num1 = torch.rand(1).item()
+        # num2 = torch.rand(1).item()
 
-        # Calculate the total
-        total = num1 + num2
+        # # Calculate the total
+        # total = num1 + num2
 
-        # Calculate the percentage of each number
-        weight1 = (num1 / total)
-        weight2 = (num2 / total)
+        # # Calculate the percentage of each number
+        # weight1 = (num1 / total)
+        # weight2 = (num2 / total)
+
 
 
         for batchdata in tqdm(train_loader, desc='Training'):
@@ -228,17 +260,11 @@ def training(
             labels = labels.to(cuda)
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
-            loss_sc=nt_xent_criterion(r_rep, p_rep)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
-            loss_ce = loss_fn(pred, labels)
-            loss=weight1*loss_ce+weight2*loss_sc
+            loss= loss_fn(pred, labels)
 
-            ##Uncertainty 
-            # loss = (1 - 0.1) * loss.mean() + 0.1 * (
-            #     loss * torch.exp(-logvar) + logvar
-            # ).mean()
 
             optimizer.zero_grad()
             loss.backward()
@@ -259,15 +285,13 @@ def training(
 
             
             print(
-                "--- training epoch %d, loss %.3f, acc %.3f, mcc %.3f, time elapsed(min) %.2f, weight1 %.3f, weight2 %.3f---"
+                "--- training epoch %d, loss %.3f, acc %.3f, mcc %.3f, time elapsed(min) %.2f---"
                 % (
                     epoch,
                     np.mean(train_loss_list),
                     acc,
                     mcc,
                     (time.time() - start_time) / 60,
-                    weight1,
-                    weight2,
                 )
             )
 
