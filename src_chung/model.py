@@ -181,7 +181,7 @@ def training(
     print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 2
+    n_epochs = 50
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
