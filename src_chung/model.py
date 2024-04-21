@@ -140,16 +140,16 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 96)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 96)
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
         r_graph_feats_attetion=r_graph_feats
 
-        r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
-        p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+        # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
+        # p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
 
         # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
@@ -164,7 +164,6 @@ def training(
     val_loader,
     model_path,
     val_monitor_epoch=1,
-    n_forward_pass=5,
     cuda=torch.device('cuda:0'),
 ):
     train_size = train_loader.dataset.__len__()
@@ -179,9 +178,9 @@ def training(
     except:
         rmol_max_cnt = train_loader.dataset.rmol_max_cnt
         pmol_max_cnt = train_loader.dataset.pmol_max_cnt
+    print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-
     n_epochs = 2
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
@@ -192,48 +191,49 @@ def training(
     acc_all_val=[]
     mcc_all=[]
     mcc_all_val=[]
+    weight_sc_list=[]
 
     best_val_loss =1e10
-    best_loss=1e10
-    net_contra = net
-    for epoch in range(n_epochs):
-        # training
-        net_contra.train()
-        start_time = time.time()
+    # best_loss=1e10
+    # net_contra = net
+    # for epoch in range(15):
+    #     # training
+    #     net_contra.train()
+    #     start_time = time.time()
 
-        # inputs_rmol=[]
-        # inputs_pmol=[]
-        train_loss_contra_list=[]
-        for batchdata in tqdm(train_loader, desc='Training_contra'):
-            inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            inputs_pmol = [
-                b.to(cuda)
-                for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
-            ]
-            # inputs_rmol.extend(input_rmol)
-            # inputs_pmol.extend(input_pmol)
+    #     # inputs_rmol=[]
+    #     # inputs_pmol=[]
+    #     train_loss_contra_list=[]
+    #     for batchdata in tqdm(train_loader, desc='Training_contra'):
+    #         inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+    #         inputs_pmol = [
+    #             b.to(cuda)
+    #             for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
+    #         ]
+    #         # inputs_rmol.extend(input_rmol)
+    #         # inputs_pmol.extend(input_pmol)
         
-            r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+    #         r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
 
-            r_rep=F.normalize(r_rep, dim=1)
-            p_rep=F.normalize(p_rep, dim=1)
-            loss_sc=nt_xent_criterion(r_rep, p_rep)
+    #         r_rep=F.normalize(r_rep, dim=1)
+    #         p_rep=F.normalize(p_rep, dim=1)
+    #         loss_sc=nt_xent_criterion(r_rep, p_rep)
 
-            optimizer.zero_grad()
-            loss_sc.backward()
-            optimizer.step()
+    #         optimizer.zero_grad()
+    #         loss_sc.backward()
+    #         optimizer.step()
 
-            train_loss_contra = loss_sc.detach().item()
-            train_loss_contra_list.append(train_loss_contra)
+    #         train_loss_contra = loss_sc.detach().item()
+    #         train_loss_contra_list.append(train_loss_contra)
 
-        print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
-            % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
+    #     print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
+    #         % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
         
 
-        if np.mean(train_loss_contra_list) < best_loss:
-            best_loss = np.mean(train_loss_contra_list)
-            net = net_contra
-    print('\n'+'*'*100)
+    #     if np.mean(train_loss_contra_list) < best_loss:
+    #         best_loss = np.mean(train_loss_contra_list)
+    #         net = net_contra
+    # print('\n'+'*'*100)
 
     for epoch in range(n_epochs):
         # training
@@ -244,6 +244,12 @@ def training(
         train_loss_list = []
         targets=[]
         preds=[]
+
+        # # weight_ce=torch.rand(1).item()
+        # # weight_sc=1-weight_ce
+        # # weight_sc_list.append(weight_sc)
+        # weight_ce=0.62
+        # weight_sc=0.38
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
@@ -258,9 +264,16 @@ def training(
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
+            # r_rep_contra=F.normalize(r_rep, dim=1)
+            # p_rep_contra=F.normalize(p_rep, dim=1)
+            # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
+
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
             loss= loss_fn(pred, labels)
+
+
+            # loss = weight_ce*loss_ce+weight_sc*loss_sc
 
 
             optimizer.zero_grad()
@@ -353,24 +366,12 @@ def training(
                     % (epoch, np.mean(val_loss_list),val_acc,val_mcc)
                 )
                 print('\n'+'*'*100)
+        if np.mean(val_loss_list) < best_val_loss:
+            best_val_loss = np.mean(val_loss_list)
+            torch.save(net.state_dict(), model_path)
 
-    #visualize
-
-    # sns.set()
-    # fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-    # sns.lineplot(data=train_loss_all, label='train', ax=axes[0]).set(title='Loss')
-    # sns.lineplot(data=val_loss_all, label='valid', ax=axes[0])
-    # # plot acc learning curves
-    # sns.lineplot(data=acc_all, label='train', ax=axes[1]).set(title='Accuracy')
-    # sns.lineplot(data=acc_all_val, label='valid', ax=axes[1])
-    # # plot mcc learning curves
-    # sns.lineplot(data=mcc_all, label='train', ax=axes[2]).set(title='Matthews Correlation Coefficient')
-    # sns.lineplot(data=mcc_all_val, label='valid', ax=axes[2])
-
-    # plt.show()
 
     print("training terminated at epoch %d" % epoch)
-    # torch.save(net.state_dict(), model_path)
 
     return net
 
@@ -378,7 +379,6 @@ def training(
 def inference(
     net,
     test_loader,
-    n_forward_pass=30,
     cuda=torch.device('cuda:0'),
 ):
     batch_size = test_loader.batch_size
@@ -392,7 +392,6 @@ def inference(
         pmol_max_cnt = test_loader.dataset.pmol_max_cnt
 
     net.eval()
-    # MC_dropout(net)
 
     pred_y = []
 
@@ -408,8 +407,7 @@ def inference(
             pred = net.predict(torch.sub(r_rep,p_rep))
 
 
-            # pred_y.append(pred.cpu().numpy())
             pred_y.extend(torch.argmax(pred,dim=1).tolist())
-            # val_preds.extend(torch.argmax(pred_y, dim=1).tolist()) 
+
 
     return pred_y
