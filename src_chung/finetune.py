@@ -47,7 +47,6 @@ def finetune(args):
         batch_size=batch_size,
         shuffle=False,
         collate_fn=collate_reaction_graphs,
-        drop_last=True,
     )
 
 
