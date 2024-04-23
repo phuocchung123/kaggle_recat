@@ -194,46 +194,46 @@ def training(
     weight_sc_list=[]
 
     best_val_loss =1e10
-    best_loss=1e10
-    net_contra = net
-    for epoch in range(15):
-        # training
-        net_contra.train()
-        start_time = time.time()
+    # best_loss=1e10
+    # net_contra = net
+    # for epoch in range(15):
+    #     # training
+    #     net_contra.train()
+    #     start_time = time.time()
 
-        # inputs_rmol=[]
-        # inputs_pmol=[]
-        train_loss_contra_list=[]
-        for batchdata in tqdm(train_loader, desc='Training_contra'):
-            inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            inputs_pmol = [
-                b.to(cuda)
-                for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
-            ]
-            # inputs_rmol.extend(input_rmol)
-            # inputs_pmol.extend(input_pmol)
+    #     # inputs_rmol=[]
+    #     # inputs_pmol=[]
+    #     train_loss_contra_list=[]
+    #     for batchdata in tqdm(train_loader, desc='Training_contra'):
+    #         inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+    #         inputs_pmol = [
+    #             b.to(cuda)
+    #             for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
+    #         ]
+    #         # inputs_rmol.extend(input_rmol)
+    #         # inputs_pmol.extend(input_pmol)
         
-            r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+    #         r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
 
-            r_rep=F.normalize(r_rep, dim=1)
-            p_rep=F.normalize(p_rep, dim=1)
-            loss_sc=nt_xent_criterion(r_rep, p_rep)
+    #         r_rep=F.normalize(r_rep, dim=1)
+    #         p_rep=F.normalize(p_rep, dim=1)
+    #         loss_sc=nt_xent_criterion(r_rep, p_rep)
 
-            optimizer.zero_grad()
-            loss_sc.backward()
-            optimizer.step()
+    #         optimizer.zero_grad()
+    #         loss_sc.backward()
+    #         optimizer.step()
 
-            train_loss_contra = loss_sc.detach().item()
-            train_loss_contra_list.append(train_loss_contra)
+    #         train_loss_contra = loss_sc.detach().item()
+    #         train_loss_contra_list.append(train_loss_contra)
 
-        print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
-            % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
+    #     print("--- training epoch %d, loss %.3f, time elapsed(min) %.2f---"
+    #         % (epoch, np.mean(train_loss_contra_list), (time.time() - start_time) / 60))
         
 
-        if np.mean(train_loss_contra_list) < best_loss:
-            best_loss = np.mean(train_loss_contra_list)
-            net = net_contra
-    print('\n'+'*'*100)
+    #     if np.mean(train_loss_contra_list) < best_loss:
+    #         best_loss = np.mean(train_loss_contra_list)
+    #         net = net_contra
+    # print('\n'+'*'*100)
 
     for epoch in range(n_epochs):
         # training
@@ -248,8 +248,8 @@ def training(
         # # weight_ce=torch.rand(1).item()
         # # weight_sc=1-weight_ce
         # # weight_sc_list.append(weight_sc)
-        # weight_ce=0.80
-        # weight_sc=0.20
+        weight_ce=0.62
+        weight_sc=0.38
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
@@ -264,16 +264,16 @@ def training(
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            # r_rep_contra=F.normalize(r_rep, dim=1)
-            # p_rep_contra=F.normalize(p_rep, dim=1)
-            # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
+            r_rep_contra=F.normalize(r_rep, dim=1)
+            p_rep_contra=F.normalize(p_rep, dim=1)
+            loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
-            loss= loss_fn(pred, labels)
+            loss_ce= loss_fn(pred, labels)
 
 
-            # loss = weight_ce*loss_ce+weight_sc*loss_sc
+            loss = weight_ce*loss_ce+weight_sc*loss_sc
 
 
             optimizer.zero_grad()
