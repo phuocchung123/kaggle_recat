@@ -89,8 +89,11 @@ class EncoderLayer(nn.Module):
         self.ffn_dropout = nn.Dropout(dropout_rate)
 
     def forward(self, x, kv, attn_bias=None):
+        print(x.shape)
         y = self.self_attention_norm(x)
+        print(y.shape)
         kv = self.self_attention_norm(kv)
+        print(kv.shape)
         y = self.self_attention(y, kv, kv, attn_bias)
         y = self.self_attention_dropout(y)
         x = x + y
