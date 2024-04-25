@@ -43,12 +43,12 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, q, k, v, attn_bias=None):
         orig_q_size = q.size()
-        print(q.shape)
+        print('q_shape: ',q.shape)
 
         d_k = self.att_size
-        print(d_k.shape)
+        print('dk shape: ',d_k.shape)
         d_v = self.att_size
-        print(d_v.shape)
+        print('dv shape: ',d_v.shape)
         batch_size = q.size(0)
 
         q = self.linear_q(q).view(batch_size, -1, self.num_heads, d_k)
@@ -92,11 +92,11 @@ class EncoderLayer(nn.Module):
         self.ffn_dropout = nn.Dropout(dropout_rate)
 
     def forward(self, x, kv, attn_bias=None):
-        print(x.shape)
+        print('x_shape: ',x.shape)
         y = self.self_attention_norm(x)
-        print(y.shape)
+        print('y_shape: ',y.shape)
         kv = self.self_attention_norm(kv)
-        print(kv.shape)
+        print('kv_shape: ',kv.shape)
         y = self.self_attention(y, kv, kv, attn_bias)
         y = self.self_attention_dropout(y)
         x = x + y
