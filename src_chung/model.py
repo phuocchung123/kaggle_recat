@@ -87,12 +87,12 @@ class GIN(nn.Module):
             if i < self.depth - 1:
                 node_feats = nn.functional.relu(node_feats)
 
-        #     node_feats = self.dropout(node_feats)
+            node_feats = self.dropout(node_feats)
 
-        # readout = self.readout(g, node_feats)
-        # readout = self.sparsify(readout)
+        readout = self.readout(g, node_feats)
+        readout = self.sparsify(readout)
 
-        return node_feats
+        return readout
 
     def load_my_state_dict(self, state_dict):
         own_state = self.state_dict()
