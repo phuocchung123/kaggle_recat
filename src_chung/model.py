@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
-from dgl.nn.pytorch.glob import AvgPooling
+from dgl.nn.pytorch.glob import SumPooling
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -65,7 +65,7 @@ class GIN(nn.Module):
             ]
         )
 
-        self.readout = AvgPooling()
+        self.readout = SumPooling()
 
         self.sparsify = nn.Sequential(
             nn.Linear(node_hid_feats, readout_feats), nn.PReLU()
@@ -144,21 +144,21 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 96)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.stack([self.mpnn(mol) for mol in rmols])
-        p_graph_feats = torch.stack([self.mpnn(mol) for mol in pmols])
+        r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]),0)
+        p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]),0)
         r_graph_feats_attetion=r_graph_feats
 
         r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
         p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
-        r_graph_feats_sum=torch.sum(r_graph_feats, 0)
-        p_graph_feats_sum=torch.sum(p_graph_feats, 0)
+        # r_graph_feats_sum=torch.sum(r_graph_feats, 0)
+        # p_graph_feats_sum=torch.sum(p_graph_feats, 0)
 
 
         # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
         # out = self.predict(concat_feats)
 
-        return r_graph_feats_sum, p_graph_feats_sum
+        return r_graph_feats, p_graph_feats
 
 
 def training(
@@ -184,7 +184,7 @@ def training(
     print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 2
+    n_epochs = 20
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
