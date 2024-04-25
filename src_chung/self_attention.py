@@ -15,7 +15,7 @@ class FeedForwardNetwork(nn.Module):
 
         self.layer1 = nn.Linear(hidden_size, ffn_size)
         #        self.gelu = GELU()
-        self.gelu = nn.GeLU()
+        self.gelu = nn.GELU()
         self.layer2 = nn.Linear(ffn_size, hidden_size)
 
     def forward(self, x):
