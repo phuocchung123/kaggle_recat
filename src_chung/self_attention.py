@@ -43,9 +43,12 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, q, k, v, attn_bias=None):
         orig_q_size = q.size()
+        print(q.shape)
 
         d_k = self.att_size
+        print(d_k.shape)
         d_v = self.att_size
+        print(d_v.shape)
         batch_size = q.size(0)
 
         q = self.linear_q(q).view(batch_size, -1, self.num_heads, d_k)
