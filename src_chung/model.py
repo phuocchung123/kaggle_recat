@@ -144,18 +144,21 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 96)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
-        p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
+        r_graph_feats = torch.stack([self.mpnn(mol) for mol in rmols])
+        p_graph_feats = torch.stack([self.mpnn(mol) for mol in pmols])
         r_graph_feats_attetion=r_graph_feats
 
         r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
         p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
+        r_graph_feats_sum=torch.sum(r_graph_feats, 0)
+        p_graph_feats_sum=torch.sum(p_graph_feats, 0)
+
 
         # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
         # out = self.predict(concat_feats)
 
-        return r_graph_feats, p_graph_feats
+        return r_graph_feats_sum, p_graph_feats_sum
 
 
 def training(
@@ -248,8 +251,8 @@ def training(
         # # weight_ce=torch.rand(1).item()
         # # weight_sc=1-weight_ce
         # # weight_sc_list.append(weight_sc)
-        weight_ce=0.62
-        weight_sc=0.38
+        # weight_ce=0.62
+        # weight_sc=0.38
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
@@ -264,16 +267,16 @@ def training(
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            r_rep_contra=F.normalize(r_rep, dim=1)
-            p_rep_contra=F.normalize(p_rep, dim=1)
-            loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
+            # r_rep_contra=F.normalize(r_rep, dim=1)
+            # p_rep_contra=F.normalize(p_rep, dim=1)
+            # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
-            loss_ce= loss_fn(pred, labels)
+            loss= loss_fn(pred, labels)
 
 
-            loss = weight_ce*loss_ce+weight_sc*loss_sc
+            # loss = weight_ce*loss_ce+weight_sc*loss_sc
 
 
             optimizer.zero_grad()

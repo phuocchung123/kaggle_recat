@@ -15,7 +15,7 @@ class FeedForwardNetwork(nn.Module):
 
         self.layer1 = nn.Linear(hidden_size, ffn_size)
         #        self.gelu = GELU()
-        self.gelu = nn.ReLU(inplace=True)
+        self.gelu = nn.GeLU()
         self.layer2 = nn.Linear(ffn_size, hidden_size)
 
     def forward(self, x):
@@ -63,21 +63,6 @@ class MultiHeadAttention(nn.Module):
         if attn_bias is not None:
             x = x + attn_bias
         x = torch.softmax(x, dim=3)
-        #
-        # Attention analyse
-        #        csvwriter = csv.writer(open("attention.csv","a+",newline=""))
-
-#         temp = x.cpu().detach().numpy()
-#         #        temp = temp.argmax(axis = 2)
-#         temp = temp.mean(axis=2)
-# #        print(temp.shape)
-#         if temp.shape == (290,2,63):
-#             np.save("attention.npy",temp)
-
-
-        #        
-#        np.save("")
-        #        csvwriter.writerows(temp.tolist())
         x = self.att_dropout(x)
         x = x.matmul(v)  # [b, h, q_len, attn]
         
