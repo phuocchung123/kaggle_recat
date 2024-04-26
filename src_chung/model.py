@@ -263,6 +263,12 @@ def training(
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
 
+            for reactant,product in zip(inputs_rmol,inputs_pmol):
+                print('reactant_shape: ',reactant.shape)
+                print('product_shape: ',product.shape)
+                r_rep,p_rep= net(reactant,product )
+                break
+
             labels = batchdata[-1]
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
