@@ -146,8 +146,6 @@ class reactionMPNN(nn.Module):
     def forward(self, rmols, pmols):
         r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]),0)
         p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]),0)
-        # print('r_graph_feats: ',r_graph_feats.shape)
-        # print('p_graph_feats: ',p_graph_feats.shape)
         r_graph_feats_attetion=r_graph_feats
 
         # r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
