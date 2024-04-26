@@ -50,7 +50,10 @@ class MultiHeadAttention(nn.Module):
         batch_size = q.size(0)
 
         q = self.linear_q(q).view(batch_size, -1, self.num_heads, d_k)
-        k = self.linear_k(k).view(batch_size, -1, self.num_heads, d_k)
+        k = self.linear_k(k)
+        print('k_shape: ',k.shape)
+        k=k.view(batch_size, -1, self.num_heads, d_k)
+        print('k_shape ver2: ',k.shape)
         v = self.linear_v(v).view(batch_size, -1, self.num_heads, d_v)
 
         q = q.transpose(1, 2)  # [b, h, q_len, d_k]
