@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
-from dgl.nn.pytorch.glob import AvgPooling
+from dgl.nn.pytorch.glob import SumPooling, AvgPooling
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -65,7 +65,7 @@ class GIN(nn.Module):
             ]
         )
 
-        self.readout = AvgPooling()
+        self.readout = SumPooling()
 
         self.sparsify = nn.Sequential(
             nn.Linear(node_hid_feats, readout_feats), nn.PReLU()
@@ -89,10 +89,10 @@ class GIN(nn.Module):
 
             node_feats = self.dropout(node_feats)
 
-        readout = self.readout(g, node_feats)
-        readout = self.sparsify(readout)
+        # readout = self.readout(g, node_feats)
+        # readout = self.sparsify(readout)
 
-        return readout
+        return node_feats
 
     def load_my_state_dict(self, state_dict):
         own_state = self.state_dict()
@@ -114,7 +114,7 @@ class reactionMPNN(nn.Module):
         node_in_feats,
         edge_in_feats,
         pretrained_model_path=None,
-        readout_feats=1024,
+        readout_feats=300,
         predict_hidden_feats=512,
         prob_dropout=0.1,
     ):
@@ -140,16 +140,21 @@ class reactionMPNN(nn.Module):
         )
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 96)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 96)
+        self.rea_attention_pro = EncoderLayer(300,512, 0.1, 0.1, 2)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]), 0)
-        p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]), 0)
+        r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]),0)
+        print('r_graph_feats: ', r_graph_feats.shape)
+        p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]),0)
+        print('p_graph_feats: ', p_graph_feats.shape)
         r_graph_feats_attetion=r_graph_feats
 
         r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
         p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
+
+        # r_graph_feats=torch.sum(r_graph_feats, 0)
+        # p_graph_feats=torch.sum(p_graph_feats, 0)
 
 
         # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
@@ -181,7 +186,7 @@ def training(
     print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 50
+    n_epochs = 20
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
@@ -248,15 +253,17 @@ def training(
         # # weight_ce=torch.rand(1).item()
         # # weight_sc=1-weight_ce
         # # weight_sc_list.append(weight_sc)
-        weight_ce=0.80
-        weight_sc=0.20
+        # weight_ce=0.62
+        # weight_sc=0.38
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+            # print('inputs_rmol_shape: ',len(inputs_rmol))
             inputs_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
+            # print('inputs_pmol_shape: ',len(inputs_pmol))
 
             labels = batchdata[-1]
             targets.extend(labels.tolist())
@@ -269,8 +276,9 @@ def training(
             # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
-            preds.extend(torch.argmax(pred, dim=1).tolist())
-            loss= loss_fn(pred, labels)
+            print('pred_shape: ',pred.shape)
+            preds.extend(torch.argmax(pred).tolist())
+            loss= loss_fn(preds, labels)
 
 
             # loss = weight_ce*loss_ce+weight_sc*loss_sc
@@ -373,7 +381,7 @@ def training(
 
     print("training terminated at epoch %d" % epoch)
 
-    return net,train_loss_all, val_loss_all, acc_all, mcc_all, acc_all_val, mcc_all_val
+    return net
 
 
 def inference(
