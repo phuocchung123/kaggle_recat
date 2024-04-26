@@ -144,9 +144,9 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.cat([self.mpnn(mol) for mol in rmols],dim=0)
+        r_graph_feats = [self.mpnn(mol) for mol in rmols]
         print('r_graph_feats: ', r_graph_feats.shape)
-        p_graph_feats = torch.cat([self.mpnn(mol) for mol in pmols],dim=0)
+        p_graph_feats = [self.mpnn(mol) for mol in pmols]
         print('p_graph_feats: ', p_graph_feats.shape)
         r_graph_feats_attetion=r_graph_feats
 
