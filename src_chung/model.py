@@ -144,17 +144,17 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = [self.mpnn(mol) for mol in rmols]
+        r_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in rmols]),0)
         print('r_graph_feats: ', r_graph_feats.shape)
-        p_graph_feats = [self.mpnn(mol) for mol in pmols]
+        p_graph_feats = torch.sum(torch.stack([self.mpnn(mol) for mol in pmols]),0)
         print('p_graph_feats: ', p_graph_feats.shape)
         r_graph_feats_attetion=r_graph_feats
 
         r_graph_feats=self.rea_attention_pro(r_graph_feats, p_graph_feats)
         p_graph_feats=self.pro_attention_rea(p_graph_feats, r_graph_feats_attetion)
 
-        r_graph_feats=torch.sum(r_graph_feats, 0)
-        p_graph_feats=torch.sum(p_graph_feats, 0)
+        # r_graph_feats=torch.sum(r_graph_feats, 0)
+        # p_graph_feats=torch.sum(p_graph_feats, 0)
 
 
         # concat_feats = torch.cat([r_graph_feats,p_graph_feats],1)
@@ -248,7 +248,7 @@ def training(
 
         train_loss_list = []
         targets=[]
-        # preds=[]
+        preds=[]
 
         # # weight_ce=torch.rand(1).item()
         # # weight_sc=1-weight_ce
@@ -258,33 +258,26 @@ def training(
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            print('inputs_rmol_shape: ',len(inputs_rmol))
+            # print('inputs_rmol_shape: ',len(inputs_rmol))
             inputs_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
-            print('inputs_pmol_shape: ',len(inputs_pmol))
-            preds=[]
-            for reactant,product in zip(inputs_rmol,inputs_pmol):
-                r_rep,p_rep= net(reactant,product )
-                pred = net.predict(torch.sub(r_rep,p_rep))
-
-                preds.extend(torch.argmax(pred).tolist())
-            print('preds_shape: ',preds.shape)
+            # print('inputs_pmol_shape: ',len(inputs_pmol))
 
             labels = batchdata[-1]
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
 
-            # r_rep,p_rep= net(inputs_rmol, inputs_pmol)
+            r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            # # r_rep_contra=F.normalize(r_rep, dim=1)
-            # # p_rep_contra=F.normalize(p_rep, dim=1)
-            # # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
+            # r_rep_contra=F.normalize(r_rep, dim=1)
+            # p_rep_contra=F.normalize(p_rep, dim=1)
+            # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
-            # pred = net.predict(torch.sub(r_rep,p_rep))
-            # print('pred_shape: ',pred.shape)
-            # preds.extend(torch.argmax(pred).tolist())
+            pred = net.predict(torch.sub(r_rep,p_rep))
+            print('pred_shape: ',pred.shape)
+            preds.extend(torch.argmax(pred).tolist())
             loss= loss_fn(preds, labels)
 
 
