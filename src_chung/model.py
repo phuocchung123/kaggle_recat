@@ -248,7 +248,7 @@ def training(
 
         train_loss_list = []
         targets=[]
-        preds=[]
+        # preds=[]
 
         # # weight_ce=torch.rand(1).item()
         # # weight_sc=1-weight_ce
@@ -262,27 +262,28 @@ def training(
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
-
+            preds=[]
             for reactant,product in zip(inputs_rmol,inputs_pmol):
-                print('reactant_shape: ',reactant.shape)
-                print('product_shape: ',product.shape)
                 r_rep,p_rep= net(reactant,product )
-                break
+                pred = net.predict(torch.sub(r_rep,p_rep))
+
+                preds.extend(torch.argmax(pred).tolist())
+            print('preds_shape: ',preds.shape)
 
             labels = batchdata[-1]
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
 
-            r_rep,p_rep= net(inputs_rmol, inputs_pmol)
+            # r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            # r_rep_contra=F.normalize(r_rep, dim=1)
-            # p_rep_contra=F.normalize(p_rep, dim=1)
-            # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
+            # # r_rep_contra=F.normalize(r_rep, dim=1)
+            # # p_rep_contra=F.normalize(p_rep, dim=1)
+            # # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
-            pred = net.predict(torch.sub(r_rep,p_rep))
-            print('pred_shape: ',pred.shape)
-            preds.extend(torch.argmax(pred).tolist())
-            loss= loss_fn(pred, labels)
+            # pred = net.predict(torch.sub(r_rep,p_rep))
+            # print('pred_shape: ',pred.shape)
+            # preds.extend(torch.argmax(pred).tolist())
+            loss= loss_fn(preds, labels)
 
 
             # loss = weight_ce*loss_ce+weight_sc*loss_sc
