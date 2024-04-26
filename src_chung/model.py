@@ -274,6 +274,7 @@ def training(
             # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
+            print('pred_shape: ',pred.shape)
             preds.extend(torch.argmax(pred, dim=1).tolist())
             loss= loss_fn(pred, labels)
 
