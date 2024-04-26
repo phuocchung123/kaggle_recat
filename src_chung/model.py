@@ -253,10 +253,12 @@ def training(
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
+            print('inputs_rmol:', len(inputs_rmol))
             inputs_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
+            print('inputs_pmol:', len(inputs_pmol))
 
             labels = batchdata[-1]
             targets.extend(labels.tolist())
@@ -269,6 +271,7 @@ def training(
             # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
+            print('pred_size:', pred.size())
             preds.extend(torch.argmax(pred, dim=1).tolist())
             loss= loss_fn(pred, labels)
 
