@@ -258,12 +258,12 @@ def training(
 
         for batchdata in tqdm(train_loader, desc='Training'):
             inputs_rmol = [b.to(cuda) for b in batchdata[:rmol_max_cnt]]
-            print('inputs_rmol_shape: ',inputs_rmol.shape)
+            print('inputs_rmol_shape: ',len(inputs_rmol))
             inputs_pmol = [
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt : rmol_max_cnt + pmol_max_cnt]
             ]
-            print('inputs_pmol_shape: ',inputs_pmol.shape)
+            print('inputs_pmol_shape: ',len(inputs_pmol))
             preds=[]
             for reactant,product in zip(inputs_rmol,inputs_pmol):
                 r_rep,p_rep= net(reactant,product )
