@@ -36,7 +36,7 @@ class GIN(nn.Module):
         node_in_feats,
         edge_in_feats,
         depth=3,
-        node_hid_feats=300,
+        node_hid_feats=1024,
         readout_feats=1024,
         dr=0.1,
     ):
