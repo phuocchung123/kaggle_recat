@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
-from dgl.nn.pytorch.glob import SumPooling
+from dgl.nn.pytorch.glob import SumPooling, AvgPooling
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -65,7 +65,7 @@ class GIN(nn.Module):
             ]
         )
 
-        self.readout = SumPooling()
+        self.readout = AvgPooling()
 
         self.sparsify = nn.Sequential(
             nn.Linear(node_hid_feats, readout_feats), nn.PReLU()
