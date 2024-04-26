@@ -59,26 +59,25 @@ class MultiHeadAttention(nn.Module):
         v = self.linear_v(v).view(batch_size_k, -1, self.num_heads, d_v)
         print('v_shape: ',v.shape)
 
-        q = q.transpose(1, 2)  # [b, h, q_len, d_k]
-        v = v.transpose(1, 2)  # [b, h, v_len, d_v]
-        k = k.transpose(1, 2).transpose(2, 3)  # [b, h, d_k, k_len]
+        q = q.transpose(0, 2)  # [q_len, h, b_q, d_q]
+        v = v.transpose(0, 2)  # [v_len, h, b_kv, d_v]
+        k = k.transpose(0, 2).transpose(2, 3)  # [k_len, h, d_k, b_kv]
 
         # Scaled Dot-Product Attention.
         # Attention(Q, K, V) = softmax((QK^T)/sqrt(d_k))V
         q = q * self.scale
-        x = torch.matmul(q, k)  # [b, h, q_len, k_len]
+        x = torch.matmul(q, k)  # [q_len(k_len), h, b_q, b_kv]
         if attn_bias is not None:
             x = x + attn_bias
         x = torch.softmax(x, dim=3)
         x = self.att_dropout(x)
-        x = x.matmul(v)  # [b, h, q_len, attn]
+        x = x.matmul(v)  # [b, h, q_len, attn] [q_len(k_len), h, b_q, d_v]
         
-        x = x.transpose(1, 2).contiguous()  # [b, q_len, h, attn]
-        x = x.view(batch_size, -1, self.num_heads * d_v)
+        x = x.transpose(0, 2).transpose(1,2).contiguous()  # [b, q_len, h, attn] [b_q, q_len(k_len),h, d_v]
+        x = x.view(batch_size_q, -1, self.num_heads * d_v)
         x = self.output_layer(x)
 
         x=x.squeeze(1)
-        assert x.size() == orig_q_size
         return x
 
 
