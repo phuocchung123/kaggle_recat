@@ -146,8 +146,10 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = [self.mpnn(mol) for mol in rmols]
-        p_graph_feats = [self.mpnn(mol) for mol in pmols]
+        r_graph_feats = torch.Tensor([self.mpnn(mol) for mol in rmols])
+        print('r_graph_feats: ',r_graph_feats.shape)
+        p_graph_feats = torch.Tensor([self.mpnn(mol) for mol in pmols])
+        print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
         batch_size=r_num_nodes.size(1)
@@ -156,8 +158,8 @@ class reactionMPNN(nn.Module):
         r_graph_feats=[]
         p_graph_feats=[]
         for i in range(batch_size):
-            reactant=[]
-            product=[]
+            reactant=torch.Tensor()
+            product=torch.Tensor()
 
             start=0
             for m in range(r_num_nodes.size(0)):
