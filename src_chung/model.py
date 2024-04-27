@@ -303,8 +303,8 @@ def training(
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            # r_rep_contra=F.normalize(r_rep, dim=1)
-            # p_rep_contra=F.normalize(p_rep, dim=1)
+            r_rep_contra=F.normalize(r_rep, dim=1)
+            p_rep_contra=F.normalize(p_rep, dim=1)
             # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
