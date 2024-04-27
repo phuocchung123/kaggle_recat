@@ -150,9 +150,9 @@ class reactionMPNN(nn.Module):
 
     def forward(self, rmols, pmols):
         r_graph_feats = torch.cat([self.mpnn(mol) for mol in rmols])
-        print('r_graph_feats: ',r_graph_feats.shape)
+        # print('r_graph_feats: ',r_graph_feats.shape)
         p_graph_feats = torch.cat([self.mpnn(mol) for mol in pmols])
-        print('p_graph_feats: ',p_graph_feats.shape)
+        # print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
         batch_size=r_num_nodes.size(1)
@@ -179,18 +179,18 @@ class reactionMPNN(nn.Module):
                 start=end
 
             r_graph_feat=self.rea_attention_pro(reactants, products)
-            print('r_graph_feat: ',r_graph_feat.shape)
+            # print('r_graph_feat: ',r_graph_feat.shape)
             r_graph_feat=torch.sum(r_graph_feat,0).unsqueeze(0)
             r_graph_feats_out=torch.cat((r_graph_feats_out, r_graph_feat))
-            print('r_graph_feats_out: ',r_graph_feats_out.shape)
+            # print('r_graph_feats_out: ',r_graph_feats_out.shape)
 
 
             p_graph_feat=self.pro_attention_rea(products, reactants)
-            print('p_graph_feat: ',p_graph_feat.shape)
+            # print('p_graph_feat: ',p_graph_feat.shape)
             p_graph_feat=torch.sum(p_graph_feat,0).unsqueeze(0)
-            print('p_graph_feat: ',p_graph_feat.shape)
+            # print('p_graph_feat: ',p_graph_feat.shape)
             p_graph_feats_out=torch.cat((p_graph_feats_out, p_graph_feat))
-            print('p_graph_feats_out: ',p_graph_feats_out.shape)
+            # print('p_graph_feats_out: ',p_graph_feats_out.shape)
 
         return r_graph_feats_out, p_graph_feats_out
 
@@ -215,7 +215,7 @@ def training(
     except:
         rmol_max_cnt = train_loader.dataset.rmol_max_cnt
         pmol_max_cnt = train_loader.dataset.pmol_max_cnt
-    print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
+    # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
     n_epochs = 20
