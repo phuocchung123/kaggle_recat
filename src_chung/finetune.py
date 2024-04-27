@@ -68,7 +68,7 @@ def finetune(args):
 
     pretrained_model_path = "/kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
 
-    net = reactionMPNN(node_dim, edge_dim, pretrained_model_path).cuda
+    net = reactionMPNN(node_dim, edge_dim, pretrained_model_path).to("cuda")
 
     if use_saved == False:
         print("-- TRAINING")
