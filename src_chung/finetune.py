@@ -6,7 +6,7 @@ from dgl.data.utils import split_dataset
 from sklearn.metrics import accuracy_score, matthews_corrcoef, precision_score, recall_score,f1_score
 from scipy import stats
 
-from src_chung.model_1 import reactionMPNN, training, inference
+from src_chung.model import reactionMPNN, training, inference
 from src_chung.dataset import GraphDataset
 from src_chung.util import collate_reaction_graphs
 
