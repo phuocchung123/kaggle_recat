@@ -88,12 +88,13 @@ class GIN(nn.Module):
                 node_feats = nn.functional.relu(node_feats)
 
             node_feats = self.dropout(node_feats)
-        print(node_feats.shape)
+        # print(node_feats.shape)
+        
 
         # readout = self.readout(g, node_feats)
         # readout = self.sparsify(readout)
 
-        return [node_feats]
+        return node_feats
 
     def load_my_state_dict(self, state_dict):
         own_state = self.state_dict()
@@ -146,39 +147,45 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.Tensor([self.mpnn(mol) for mol in rmols])
+        r_graph_feats = torch.cat([self.mpnn(mol) for mol in rmols])
         print('r_graph_feats: ',r_graph_feats.shape)
-        p_graph_feats = torch.Tensor([self.mpnn(mol) for mol in pmols])
+        p_graph_feats = torch.cat([self.mpnn(mol) for mol in pmols])
         print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
         batch_size=r_num_nodes.size(1)
 
 
-        r_graph_feats=[]
-        p_graph_feats=[]
+        r_graph_feats_out=torch.tensor([])
+        p_graph_feats_out=torch.tensor([])
         for i in range(batch_size):
-            reactant=torch.Tensor()
-            product=torch.Tensor()
+            reactants=torch.tensor([])
+            products=torch.tensor([])
 
             start=0
             for m in range(r_num_nodes.size(0)):
                 end=r_num_nodes[m][i]
-                reactant.append(r_graph_feats[start:end])
+                reactant=r_graph_feats[start:end]
+                reactants=torch.cat((reactants, reactant))
                 start=end
 
             start=0
             for n in range(p_num_nodes.size(0)):
                 end=p_num_nodes[n][i]
-                product.append(p_graph_feats[start:end])
+                product=p_graph_feats[start:end]
+                products=torch.cat((products, product))
                 start=end
 
             r_graph_feat=self.rea_attention_pro(reactant, product)
-            r_graph_feats.append(r_graph_feat)
-            p_graph_feat=self.pro_attention_rea(product, reactant)
-            p_graph_feats.append(p_graph_feat)
+            r_graph_feat=torch.sum(r_graph_feat, dim=0)
+            r_graph_feats=torch.cat(r_graph_feats, r_graph_feat)
 
-        return r_graph_feats, p_graph_feats
+
+            p_graph_feat=self.pro_attention_rea(product, reactant)
+            p_graph_feat=torch.sum(p_graph_feat, dim=0)
+            p_graph_feats=torch.cat(p_graph_feats, p_graph_feat)
+
+        return r_graph_feats_out, p_graph_feats_out
 
 
 def training(
