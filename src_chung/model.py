@@ -300,7 +300,6 @@ def training(
             labels = batchdata[-1]
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
-            print(labels)
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
@@ -310,8 +309,6 @@ def training(
 
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
-            pred=torch.argmax(pred,dim=1)
-            print(pred)
             loss= loss_fn(pred, labels)
 
 
@@ -383,7 +380,6 @@ def training(
                     r_rep,p_rep=net(inputs_rmol, inputs_pmol)
                     pred_val = net.predict(torch.sub(r_rep,p_rep))
                     val_preds.extend(torch.argmax(pred_val, dim=1).tolist())   
-                    pred_val=torch.argmax(pred_val,dim=1)
                     loss=loss_fn(pred_val,labels_val)
 
 
