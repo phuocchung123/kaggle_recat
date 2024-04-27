@@ -380,7 +380,8 @@ def training(
 
                     r_rep,p_rep=net(inputs_rmol, inputs_pmol)
                     pred_val = net.predict(torch.sub(r_rep,p_rep))
-                    val_preds.extend(torch.argmax(pred_val, dim=1).tolist())    
+                    val_preds.extend(torch.argmax(pred_val, dim=1).tolist())   
+                    pred_val=torch.argmax(pred_val,dim=1).tolist() 
                     loss=loss_fn(pred_val,labels_val)
 
 
