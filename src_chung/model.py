@@ -219,7 +219,7 @@ def training(
 
     loss_fn = nn.CrossEntropyLoss()
     n_epochs = 2
-    optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
+    optimizer = Adam(net.parameters(), lr=0.01, weight_decay=1e-5)
 
 
     train_loss_all=[]
