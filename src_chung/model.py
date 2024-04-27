@@ -119,6 +119,7 @@ class reactionMPNN(nn.Module):
         readout_feats=300,
         predict_hidden_feats=512,
         prob_dropout=0.1,
+        cuda=torch.device('cuda:0')
     ):
         super(reactionMPNN, self).__init__()
 
@@ -141,6 +142,7 @@ class reactionMPNN(nn.Module):
             nn.Linear(predict_hidden_feats, 50),
         )
         # self.batch_size=batch_size
+        self.cuda=cuda
 
         # Cross-Attention Module
         self.rea_attention_pro = EncoderLayer(300,512, 0.1, 0.1, 2)  # 注意力机制
@@ -156,11 +158,11 @@ class reactionMPNN(nn.Module):
         batch_size=r_num_nodes.size(1)
 
 
-        r_graph_feats_out=torch.tensor([])
-        p_graph_feats_out=torch.tensor([])
+        r_graph_feats_out=torch.tensor([]).to(self.cuda)
+        p_graph_feats_out=torch.tensor([]).to(self.cuda)
         for i in range(batch_size):
-            reactants=torch.tensor([])
-            products=torch.tensor([])
+            reactants=torch.tensor([]).to(self.cuda)
+            products=torch.tensor([]).to(self.cuda)
 
             start=0
             for m in range(r_num_nodes.size(0)):
