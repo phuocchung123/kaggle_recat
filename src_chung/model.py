@@ -179,13 +179,15 @@ class reactionMPNN(nn.Module):
                 start=end
 
             r_graph_feat=self.rea_attention_pro(reactants, products)
-            r_graph_feat=torch.sum(r_graph_feat, dim=0)
+            print('r_graph_feat: ',r_graph_feat.shape)
+            r_graph_feat=torch.sum(r_graph_feat,0)
             r_graph_feats_out=torch.cat((r_graph_feats_out, r_graph_feat))
             print('r_graph_feats_out: ',r_graph_feats_out.shape)
 
 
             p_graph_feat=self.pro_attention_rea(products, reactants)
-            p_graph_feat=torch.sum(p_graph_feat, dim=0)
+            print('p_graph_feat: ',p_graph_feat.shape)
+            p_graph_feat=torch.sum(p_graph_feat,0)
             p_graph_feats_out=torch.cat((p_graph_feats_out, p_graph_feat))
             print('p_graph_feats_out: ',p_graph_feats_out.shape)
 
