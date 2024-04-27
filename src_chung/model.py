@@ -218,8 +218,8 @@ def training(
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 2
-    optimizer = Adam(net.parameters(), lr=0.01, weight_decay=1e-5)
+    n_epochs = 20
+    optimizer = Adam(net.parameters(), lr=0.0005, weight_decay=1e-5)
 
 
     train_loss_all=[]
@@ -309,6 +309,7 @@ def training(
 
             pred = net.predict(torch.sub(r_rep,p_rep))
             preds.extend(torch.argmax(pred, dim=1).tolist())
+            pred=torch.argmax(pred,dim=1).tolist()
             loss= loss_fn(pred, labels)
 
 
