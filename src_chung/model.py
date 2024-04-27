@@ -155,7 +155,7 @@ class reactionMPNN(nn.Module):
 
         r_graph_feats=[]
         p_graph_feats=[]
-        for i in range(len(batch_size)):
+        for i in range(batch_size):
             reactant=[]
             product=[]
 
