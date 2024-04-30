@@ -116,7 +116,7 @@ class reactionMPNN(nn.Module):
         node_in_feats,
         edge_in_feats,
         pretrained_model_path=None,
-        readout_feats=300,
+        readout_feats=1024,
         predict_hidden_feats=512,
         prob_dropout=0.1,
         cuda=torch.device('cuda:0')
@@ -145,13 +145,13 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,512, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(300,512, 0.1, 0.1, 2)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
-        r_graph_feats = torch.cat([self.mpnn(mol) for mol in rmols])
+        r_graph_feats = [self.mpnn(mol) for mol in rmols]
         # print('r_graph_feats: ',r_graph_feats.shape)
-        p_graph_feats = torch.cat([self.mpnn(mol) for mol in pmols])
+        p_graph_feats = [self.mpnn(mol) for mol in pmols]
         # print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
