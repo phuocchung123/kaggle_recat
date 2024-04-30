@@ -91,10 +91,10 @@ class GIN(nn.Module):
         # print(node_feats.shape)
         
 
-        # readout = self.readout(g, node_feats)
-        # readout = self.sparsify(readout)
+        readout = self.readout(g, node_feats)
+        readout = self.sparsify(readout)
 
-        return node_feats
+        return readout
 
     def load_my_state_dict(self, state_dict):
         own_state = self.state_dict()
@@ -145,13 +145,13 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        # self.rea_attention_pro = EncoderLayer(300,512, 0.1, 0.1, 2)  # 注意力机制
-        # self.pro_attention_rea = EncoderLayer(300,512, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 32)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 32)
 
     def forward(self, rmols, pmols):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
-        # print('r_graph_feats: ',r_graph_feats.shape)
         p_graph_feats = [self.mpnn(mol) for mol in pmols]
+
         # print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
@@ -160,37 +160,31 @@ class reactionMPNN(nn.Module):
 
         r_graph_feats_out=torch.tensor([]).to(self.cuda)
         p_graph_feats_out=torch.tensor([]).to(self.cuda)
+
+
+
         for i in range(batch_size):
             reactants=torch.tensor([]).to(self.cuda)
             products=torch.tensor([]).to(self.cuda)
 
-            start=0
-            for m in range(r_num_nodes.size(0)):
-                end=r_num_nodes[m][i]
-                reactant=r_graph_feats[start:end]
+
+            for m in r_graph_feats:
+                reactant=m[i].unsqueeze(0)
                 reactants=torch.cat((reactants, reactant))
-                start=end
 
-            start=0
-            for n in range(p_num_nodes.size(0)):
-                end=p_num_nodes[n][i]
-                product=p_graph_feats[start:end]
+            for n in p_graph_feats:
+                product=n[i].unsqueeze(0)
                 products=torch.cat((products, product))
-                start=end
 
-            r_graph_feat=self.rea_attention_pro(reactants, products)
-            # print('r_graph_feat: ',r_graph_feat.shape)
-            r_graph_feat=torch.sum(r_graph_feat,0).unsqueeze(0)
+            
+
+            r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
+            p_graph_feat=torch.sum(products, 0).unsqueeze(0)
+
+
             r_graph_feats_out=torch.cat((r_graph_feats_out, r_graph_feat))
-            # print('r_graph_feats_out: ',r_graph_feats_out.shape)
-
-
-            p_graph_feat=self.pro_attention_rea(products, reactants)
-            # print('p_graph_feat: ',p_graph_feat.shape)
-            p_graph_feat=torch.sum(p_graph_feat,0).unsqueeze(0)
-            # print('p_graph_feat: ',p_graph_feat.shape)
             p_graph_feats_out=torch.cat((p_graph_feats_out, p_graph_feat))
-            # print('p_graph_feats_out: ',p_graph_feats_out.shape)
+            
 
         return r_graph_feats_out, p_graph_feats_out
 
@@ -215,11 +209,10 @@ def training(
     except:
         rmol_max_cnt = train_loader.dataset.rmol_max_cnt
         pmol_max_cnt = train_loader.dataset.pmol_max_cnt
-    # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
     n_epochs = 20
-    optimizer = Adam(net.parameters(), lr=0.00001, weight_decay=1e-5)
+    optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
     train_loss_all=[]
@@ -303,8 +296,8 @@ def training(
 
             r_rep,p_rep= net(inputs_rmol, inputs_pmol)
 
-            r_rep_contra=F.normalize(r_rep, dim=1)
-            p_rep_contra=F.normalize(p_rep, dim=1)
+            # r_rep_contra=F.normalize(r_rep, dim=1)
+            # p_rep_contra=F.normalize(p_rep, dim=1)
             # loss_sc=nt_xent_criterion(r_rep_contra, p_rep_contra)
 
             pred = net.predict(torch.sub(r_rep,p_rep))
@@ -395,11 +388,7 @@ def training(
 
 
                 val_loss_all.append(np.mean(val_loss_list))
-                acc_all_val.append(val_acc)
-                mcc_all_val.append(val_mcc)
-
-
-
+                acc_all_val.append(val_acc)lr=0.001, weight_decay=0.001
                 print(
                     "--- validation at epoch %d, val_loss %.3f, val_acc %.3f, val_mcc %.3f ---"
                     % (epoch, np.mean(val_loss_list),val_acc,val_mcc)
