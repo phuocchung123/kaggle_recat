@@ -39,7 +39,6 @@ class GIN(nn.Module):
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
-        cuda=torch.device('cuda:0'),
     ):
         super(GIN, self).__init__()
 
@@ -73,7 +72,6 @@ class GIN(nn.Module):
         )
 
         self.dropout = nn.Dropout(dr)
-        self.cuda=cuda
 
     def forward(self, g):
         node_feats_orig = g.ndata["attr"]
@@ -154,6 +152,7 @@ class reactionMPNN(nn.Module):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
         p_graph_feats = [self.mpnn(mol) for mol in pmols]
 
+        # print('p_graph_feats: ',p_graph_feats.shape)
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
         batch_size=r_num_nodes.size(1)
@@ -177,8 +176,6 @@ class reactionMPNN(nn.Module):
                 product=n[i].unsqueeze(0)
                 products=torch.cat((products, product))
 
-            # reactants=self.rea_attention_pro(reactants, products)
-            # products=self.pro_attention_rea(products, reactants)
             
 
             r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
@@ -212,7 +209,6 @@ def training(
     except:
         rmol_max_cnt = train_loader.dataset.rmol_max_cnt
         pmol_max_cnt = train_loader.dataset.pmol_max_cnt
-    # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
     n_epochs = 20
@@ -392,11 +388,7 @@ def training(
 
 
                 val_loss_all.append(np.mean(val_loss_list))
-                acc_all_val.append(val_acc)
-                mcc_all_val.append(val_mcc)
-
-
-
+                acc_all_val.append(val_acc)lr=0.001, weight_decay=0.001
                 print(
                     "--- validation at epoch %d, val_loss %.3f, val_acc %.3f, val_mcc %.3f ---"
                     % (epoch, np.mean(val_loss_list),val_acc,val_mcc)
