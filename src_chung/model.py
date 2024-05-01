@@ -76,7 +76,6 @@ class GIN(nn.Module):
         self.cuda=cuda
 
     def forward(self, g):
-        g.to(self.cuda)
         node_feats_orig = g.ndata["attr"]
         edge_feats_orig = g.edata["edge_attr"]
 
