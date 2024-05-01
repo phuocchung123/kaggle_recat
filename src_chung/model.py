@@ -39,6 +39,7 @@ class GIN(nn.Module):
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
+        cuda=torch.device('cuda:0'),
     ):
         super(GIN, self).__init__()
 
@@ -72,10 +73,11 @@ class GIN(nn.Module):
         )
 
         self.dropout = nn.Dropout(dr)
+        self.cuda=cuda
 
     def forward(self, g):
-        node_feats_orig = g.ndata["attr"]
-        edge_feats_orig = g.edata["edge_attr"]
+        node_feats_orig = g.ndata["attr"].to(self.cuda)
+        edge_feats_orig = g.edata["edge_attr"].to(self.cuda)
 
         node_feats_init = self.project_node_feats(node_feats_orig)
         node_feats = node_feats_init
@@ -145,8 +147,8 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 32)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 32)
+        # self.rea_attention_pro = EncoderLayer(1024,512, 0.1, 0.1, 32)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(1024,512, 0.1, 0.1, 32)
 
     def forward(self, rmols, pmols):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
@@ -175,8 +177,8 @@ class reactionMPNN(nn.Module):
                 product=n[i].unsqueeze(0)
                 products=torch.cat((products, product))
 
-            reactants=self.rea_attention_pro(reactants, products)
-            products=self.pro_attention_rea(products, reactants)
+            # reactants=self.rea_attention_pro(reactants, products)
+            # products=self.pro_attention_rea(products, reactants)
             
 
             r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
