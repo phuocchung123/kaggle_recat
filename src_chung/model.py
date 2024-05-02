@@ -37,7 +37,7 @@ class GIN(nn.Module):
         edge_in_feats,
         depth=3,
         node_hid_feats=300,
-        readout_feats=300,
+        readout_feats=1024,
         dr=0.1,
     ):
         super(GIN, self).__init__()
@@ -116,7 +116,7 @@ class reactionMPNN(nn.Module):
         node_in_feats,
         edge_in_feats,
         pretrained_model_path=None,
-        readout_feats=300,
+        readout_feats=1024,
         predict_hidden_feats=512,
         prob_dropout=0.1,
         cuda=torch.device('cuda:0')
