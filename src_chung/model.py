@@ -201,6 +201,7 @@ def training(
     batch_size = train_loader.batch_size
     nt_xent_criterion = NTXentLoss(cuda, batch_size)
     
+    
 
     try:
         rmol_max_cnt = train_loader.dataset.dataset.rmol_max_cnt

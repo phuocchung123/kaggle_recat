@@ -36,5 +36,4 @@ if __name__ == "__main__":
     if not os.path.exists("/kaggle/working/sample/data_chung/model/finetuned/"):
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
-
     finetune(args)
