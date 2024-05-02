@@ -65,7 +65,7 @@ class GIN(nn.Module):
             ]
         )
 
-        self.readout = AvgPooling()
+        self.readout = SumPooling()
 
         self.sparsify = nn.Sequential(
             nn.Linear(node_hid_feats, readout_feats), nn.PReLU()
