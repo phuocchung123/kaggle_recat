@@ -37,7 +37,7 @@ class GIN(nn.Module):
         edge_in_feats,
         depth=3,
         node_hid_feats=300,
-        readout_feats=1024,
+        readout_feats=300,
         dr=0.1,
     ):
         super(GIN, self).__init__()
