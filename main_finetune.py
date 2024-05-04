@@ -9,6 +9,7 @@ from rdkit import rdBase
 from src_chung.get_reaction_data import get_graph_data
 from src_chung.finetune import finetune
 import warnings
+import datetime
 
 rdBase.DisableLog("rdApp.error")
 rdBase.DisableLog("rdApp.warning")
@@ -35,5 +36,7 @@ if __name__ == "__main__":
 
     if not os.path.exists("/kaggle/working/sample/data_chung/model/finetuned/"):
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
+
+    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     finetune(args)
