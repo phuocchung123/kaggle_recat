@@ -95,7 +95,7 @@ class EncoderLayer(nn.Module):
         self.ffn_dropout = nn.Dropout(dropout_rate)
 
     def forward(self, x, kv, attn_bias=None):
-        print('this is sumpooling')
+        # print('this is sumpooling')
         # print('x_shape: ',x.shape)
         y = self.self_attention_norm(x)
         # print('y_shape: ',y.shape)
@@ -105,8 +105,8 @@ class EncoderLayer(nn.Module):
         y = self.self_attention_dropout(y)
         x = x + y
 
-        y = self.ffn_norm(x)
-        y = self.ffn(y)
-        y = self.ffn_dropout(y)
-        x = x + y
+        # y = self.ffn_norm(x)
+        # y = self.ffn(y)
+        # y = self.ffn_dropout(y)
+        # x = x + y
         return x
