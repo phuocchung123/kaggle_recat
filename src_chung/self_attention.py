@@ -71,10 +71,10 @@ class MultiHeadAttention(nn.Module):
             x = x + attn_bias
         x = torch.softmax(x, dim=3)
         x = self.att_dropout(x)
-        x = x.matmul(v)  # [b, h, q_len, attn] [q_len(k_len), h, b_q, d_v]
+        # x = x.matmul(v)  # [b, h, q_len, attn] [q_len(k_len), h, b_q, d_v]
         
-        x = x.transpose(0, 2).transpose(1,2).contiguous()  # [b, q_len, h, attn] [b_q, q_len(k_len),h, d_v]
-        x = x.view(batch_size_q, -1, self.num_heads * d_v)
+        # x = x.transpose(0, 2).transpose(1,2).contiguous()  # [b, q_len, h, attn] [b_q, q_len(k_len),h, d_v]
+        # x = x.view(batch_size_q, -1, self.num_heads * d_v)
         x = self.output_layer(x)
 
         x=x.squeeze(1)
@@ -105,8 +105,8 @@ class EncoderLayer(nn.Module):
         y = self.self_attention_dropout(y)
         x = x + y
 
-        # y = self.ffn_norm(x)
-        # y = self.ffn(y)
-        # y = self.ffn_dropout(y)
-        # x = x + y
+        y = self.ffn_norm(x)
+        y = self.ffn(y)
+        y = self.ffn_dropout(y)
+        x = x + y
         return x
