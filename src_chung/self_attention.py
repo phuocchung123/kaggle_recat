@@ -69,16 +69,16 @@ class MultiHeadAttention(nn.Module):
         x = torch.matmul(q, k)  # [q_len(k_len), h, b_q, b_kv]
         if attn_bias is not None:
             x = x + attn_bias
-        x = torch.softmax(x, dim=3)
-        x = self.att_dropout(x)
-        # x = x.matmul(v)  # [b, h, q_len, attn] [q_len(k_len), h, b_q, d_v]
+        x_att = torch.softmax(x, dim=3)
+        x = self.att_dropout(x_att)
+        x = x.matmul(v)  # [b, h, q_len, attn] [q_len(k_len), h, b_q, d_v]
         
-        # x = x.transpose(0, 2).transpose(1,2).contiguous()  # [b, q_len, h, attn] [b_q, q_len(k_len),h, d_v]
-        # x = x.view(batch_size_q, -1, self.num_heads * d_v)
+        x = x.transpose(0, 2).transpose(1,2).contiguous()  # [b, q_len, h, attn] [b_q, q_len(k_len),h, d_v]
+        x = x.view(batch_size_q, -1, self.num_heads * d_v)
         x = self.output_layer(x)
 
         x=x.squeeze(1)
-        return x
+        return x,x_att
 
 
 class EncoderLayer(nn.Module):
@@ -101,7 +101,7 @@ class EncoderLayer(nn.Module):
         # print('y_shape: ',y.shape)
         kv = self.self_attention_norm(kv)
         # print('kv_shape: ',kv.shape)
-        y = self.self_attention(y, kv, kv, attn_bias)
+        y,y_att = self.self_attention(y, kv, kv, attn_bias)
         y = self.self_attention_dropout(y)
         x = x + y
 
@@ -109,4 +109,4 @@ class EncoderLayer(nn.Module):
         y = self.ffn(y)
         y = self.ffn_dropout(y)
         x = x + y
-        return x
+        return x,y_att
