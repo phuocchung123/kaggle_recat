@@ -37,7 +37,8 @@ if __name__ == "__main__":
     if not os.path.exists("/kaggle/working/sample/data_chung/model/finetuned/"):
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
-    # start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print('num_head=1')
 
     finetune(args)
 
