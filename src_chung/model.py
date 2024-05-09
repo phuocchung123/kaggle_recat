@@ -150,17 +150,13 @@ class reactionMPNN(nn.Module):
 
     def forward(self, rmols, pmols):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
-        # print('r_graph_feats: ',len(r_graph_feats))
-        # print('1st: ', r_graph_feats[0].shape)
         p_graph_feats = [self.mpnn(mol) for mol in pmols]
-        # print('r_graph_feats: ',len(p_graph_feats))
-        # print('1st: ', p_graph_feats[0].shape)
 
-        # print('p_graph_feats: ',p_graph_feats.shape)
+
         r_num_nodes=torch.stack([i.batch_num_nodes() for i in rmols])
         p_num_nodes=torch.stack([i.batch_num_nodes() for i in pmols])
         batch_size=r_num_nodes.size(1)
-        # print('r_num_nodes: ',r_num_nodes.shape)
+
 
 
         r_graph_feats_out=torch.tensor([]).to(self.cuda)
@@ -179,8 +175,7 @@ class reactionMPNN(nn.Module):
             for idx,m in enumerate(r_graph_feats):
                 start_point=start_list_r[idx].type(torch.int32)
                 end_point=end_list_r[idx].type(torch.int32)
-                # print('start_point',start_point)
-                # print('end_point',end_point)
+
                 reactant=m[start_point:end_point]
                 reactants=torch.cat((reactants, reactant))
 
@@ -197,8 +192,8 @@ class reactionMPNN(nn.Module):
 
             start_list_p=end_list_p
 
-            reactants=self.rea_attention_pro(reactants, products)
-            products=self.pro_attention_rea(products, reactants)
+            reactants,r_att=self.rea_attention_pro(reactants, products)
+            products,p_att=self.pro_attention_rea(products, reactants)
 
             r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
             p_graph_feat=torch.sum(products, 0).unsqueeze(0)
@@ -207,39 +202,6 @@ class reactionMPNN(nn.Module):
             p_graph_feats_out=torch.cat((p_graph_feats_out, p_graph_feat))
 
 
-
-
-
-
-
-        # for i in range(batch_size):
-        #     reactants=torch.tensor([]).to(self.cuda)
-        #     products=torch.tensor([]).to(self.cuda)
-
-
-        #     for m in r_graph_feats:
-        #         reactant=m[i].unsqueeze(0)
-        #         reactants=torch.cat((reactants, reactant))
-        #     # print('reactants: ',reactants.shape)
-
-        #     for n in p_graph_feats:
-        #         product=n[i].unsqueeze(0)
-        #         products=torch.cat((products, product))
-        #     # print('products: ',products.shape)
-
-        #     reactants=self.rea_attention_pro(reactants, products)
-        #     products=self.pro_attention_rea(products, reactants)
-            
-
-        #     r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
-        #     # print('r_graph_feat: ',r_graph_feat.shape)
-        #     p_graph_feat=torch.sum(products, 0).unsqueeze(0)
-        #     # print('p_graph_feat: ',p_graph_feat.shape)
-        #     r_graph_feats_out=torch.cat((r_graph_feats_out, r_graph_feat))
-        #     # print('r_graph_feats_out: ',r_graph_feats_out.shape)
-        #     p_graph_feats_out=torch.cat((p_graph_feats_out, p_graph_feat))
-        #     # print('p_graph_feats_out: ',p_graph_feats_out.shape)
-            
 
         return r_graph_feats_out, p_graph_feats_out
 
