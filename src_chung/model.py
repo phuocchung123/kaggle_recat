@@ -192,6 +192,9 @@ class reactionMPNN(nn.Module):
 
             start_list_p=end_list_p
 
+            reactants_0,r_att_0=self.rea_attention_pro(reactants, reactants)
+            products_0,p_att_0=self.pro_attention_rea(products, products)
+
             reactants,r_att=self.rea_attention_pro(reactants, products)
             products,p_att=self.pro_attention_rea(products, reactants)
 
