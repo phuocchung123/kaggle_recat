@@ -195,8 +195,8 @@ class reactionMPNN(nn.Module):
             reactants_0,r_att_0=self.rea_attention_pro(reactants, reactants)
             products_0,p_att_0=self.pro_attention_rea(products, products)
 
-            reactants,r_att=self.rea_attention_pro(reactants, products)
-            products,p_att=self.pro_attention_rea(products, reactants)
+            reactants,r_att=self.rea_attention_pro(reactants_0, products_0)
+            products,p_att=self.pro_attention_rea(products_0, reactants_0)
 
             r_graph_feat=torch.sum(reactants, 0).unsqueeze(0)
             p_graph_feat=torch.sum(products, 0).unsqueeze(0)
