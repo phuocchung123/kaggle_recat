@@ -202,8 +202,8 @@ class reactionMPNN(nn.Module):
             start_list_p=end_list_p
 
             # reactants_noncross_0=reactants
-            # reactants,_=self.rea_attention_pro(reactants, reactants)
-            # products,_=self.pro_attention_rea(products,products)
+            reactants,_=self.rea_attention_pro(reactants, reactants)
+            products,_=self.pro_attention_rea(products,products)
 
             reactants_noncross=reactants
             reactants,att_r=self.rea_attention_pro(reactants, products)
@@ -230,7 +230,7 @@ class reactionMPNN(nn.Module):
 
             # weight=0.5*torch.rand(1) +0.5
             # weight=weight.item()
-            weight=0.7
+            weight=0.8
 
 
             reaction_feat=reaction_feat*weight+ reagents*(1-weight)
