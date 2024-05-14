@@ -145,8 +145,8 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 2)
+        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 32)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 32)
 
     def forward(self, rmols, pmols,rgmols):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
@@ -202,8 +202,8 @@ class reactionMPNN(nn.Module):
             start_list_p=end_list_p
 
             reactants_noncross=reactants
-            reactants=self.rea_attention_pro(reactants, products)
-            products=self.pro_attention_rea(products, reactants_noncross)
+            reactants,att_r=self.rea_attention_pro(reactants, products)
+            products,att_p=self.pro_attention_rea(products, reactants_noncross)
             reactants=torch.sum(reactants,0).unsqueeze(0)
             products= torch.sum(products,0).unsqueeze(0)
 
@@ -226,7 +226,7 @@ class reactionMPNN(nn.Module):
 
             # weight=0.5*torch.rand(1) +0.5
             # weight=weight.item()
-            weight=0.6
+            weight=0.5
 
 
             reaction_feat=reaction_feat*weight+ reagents*(1-weight)
