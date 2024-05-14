@@ -201,9 +201,9 @@ class reactionMPNN(nn.Module):
 
             start_list_p=end_list_p
 
-
+            reactants_noncross=reactants
             reactants=self.rea_attention_pro(reactants, products)
-            products=self.pro_attention_rea(products, reactants)
+            products=self.pro_attention_rea(products, reactants_noncross)
             reactants=torch.sum(reactants,0).unsqueeze(0)
             products= torch.sum(products,0).unsqueeze(0)
 
