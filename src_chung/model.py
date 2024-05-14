@@ -230,7 +230,7 @@ class reactionMPNN(nn.Module):
 
             # weight=0.5*torch.rand(1) +0.5
             # weight=weight.item()
-            weight=0.8
+            weight=0.7
 
 
             reaction_feat=reaction_feat*weight+ reagents*(1-weight)
