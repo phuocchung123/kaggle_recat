@@ -96,7 +96,8 @@ class EncoderLayer(nn.Module):
 
     def forward(self, x, kv, attn_bias=None):
         # print('this is sumpooling')
-        # print('x_shape: ',x.shape)
+        print('x_shape: ',x.shape)
+        print('kv_shape: ',kv.shape)
         y = self.self_attention_norm(x)
         # print('y_shape: ',y.shape)
         kv = self.self_attention_norm(kv)
