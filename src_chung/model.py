@@ -118,7 +118,7 @@ class reactionMPNN(nn.Module):
         pretrained_model_path=None,
         readout_feats=300,
         predict_hidden_feats=512,
-        prob_dropout=0.4,
+        prob_dropout=0.1,
         cuda=torch.device('cuda:0')
     ):
         super(reactionMPNN, self).__init__()
@@ -140,6 +140,7 @@ class reactionMPNN(nn.Module):
             nn.PReLU(),
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, 50),
+            nn.Softmax(dim=1),
         )
         # self.batch_size=batch_size
         self.cuda=cuda
@@ -201,12 +202,12 @@ class reactionMPNN(nn.Module):
 
             start_list_p=end_list_p
 
-            reactants,_=self.rea_attention_pro(reactants, reactants)
-            products,_=self.pro_attention_rea(products,products)
+            # reactants,_=self.rea_attention_pro(reactants, reactants)
+            # products,_=self.pro_attention_rea(products,products)
 
-            reactants_noncross=reactants
-            reactants,att_r=self.rea_attention_pro(reactants, products)
-            products,att_p=self.pro_attention_rea(products, reactants_noncross)
+            # reactants_noncross=reactants
+            # reactants,att_r=self.rea_attention_pro(reactants, products)
+            # products,att_p=self.pro_attention_rea(products, reactants_noncross)
             reactants=torch.sum(reactants,0).unsqueeze(0)
             products= torch.sum(products,0).unsqueeze(0)
 
