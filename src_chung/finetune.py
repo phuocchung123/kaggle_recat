@@ -100,13 +100,14 @@ def finetune(args):
         recall_score(test_y, test_y_pred, average="micro"),
         f1_score(test_y, test_y_pred, average="macro"),
         f1_score(test_y, test_y_pred, average="micro"),
+        f1_score(test_y, test_y_pred, average="binary"),
     ]
 
     print("-- RESULT")
     print("--- test size: %d" % (len(test_y)))
     print(
-        "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f"
-        % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7])
+        "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f,f1_binary: %.3f"
+        % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7],result[8])
     )
 
     # sns.set()
