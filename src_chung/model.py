@@ -140,7 +140,6 @@ class reactionMPNN(nn.Module):
             nn.PReLU(),
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, 50),
-            nn.Softmax(dim=1),
         )
         # self.batch_size=batch_size
         self.cuda=cuda
