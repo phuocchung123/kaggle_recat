@@ -5,6 +5,8 @@ from torch.utils.data import DataLoader
 from dgl.data.utils import split_dataset
 from sklearn.metrics import accuracy_score, matthews_corrcoef, precision_score, recall_score,f1_score
 from scipy import stats
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 from src_chung.model import reactionMPNN, training, inference
 from src_chung.dataset import GraphDataset
@@ -21,7 +23,7 @@ def finetune(args):
     use_saved = False
     model_path = "/kaggle/working/sample/data_chung/model/finetuned/model.pt"
 
-    train_set = GraphDataset(args.graph_save_path+'data_train2.npz')
+    train_set = GraphDataset(args.graph_save_path+'data_train_nonreagent.npz')
 
     train_loader = DataLoader(
         dataset=train_set,
@@ -31,7 +33,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    valid_set = GraphDataset(args.graph_save_path+'data_valid2.npz')
+    valid_set = GraphDataset(args.graph_save_path+'data_valid_nonreagent.npz')
 
     val_loader = DataLoader(
         dataset=valid_set,
@@ -41,7 +43,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    test_set=GraphDataset(args.graph_save_path+'data_test2.npz')
+    test_set=GraphDataset(args.graph_save_path+'data_test_nonreagent.npz')
     test_loader = DataLoader(
         dataset=test_set,
         batch_size=batch_size,
@@ -68,20 +70,20 @@ def finetune(args):
 
     pretrained_model_path = "/kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
 
-    net = reactionMPNN(node_dim, edge_dim, pretrained_model_path).to("cuda")
+    net = reactionMPNN(node_dim, edge_dim, pretrained_model_path).to('cuda')
 
     if use_saved == False:
         print("-- TRAINING")
-        net = training(net, train_loader,val_loader, model_path)
+        net= training(net, train_loader,val_loader, model_path)
 
     else:
         pass
 
     # # inference
     test_y = test_loader.dataset.y
-    test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
+    # test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
 
-    net = reactionMPNN(node_dim, edge_dim).to("cuda")
+    net = reactionMPNN(node_dim, edge_dim).to('cuda')
     net.load_state_dict(torch.load(model_path))
     test_y_pred = inference(
         net, test_loader,
@@ -106,3 +108,18 @@ def finetune(args):
         "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f"
         % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7])
     )
+
+    # sns.set()
+    # fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    # sns.lineplot(data=train_loss, label='train', ax=axes[0]).set(title='Loss')
+    # sns.lineplot(data=val_loss, label='valid', ax=axes[0])
+    
+    # # plot acc learning curves
+    # sns.lineplot(data=acc, label='train', ax=axes[1]).set(title='Accuracy')
+    # sns.lineplot(data=val_acc, label='valid', ax=axes[1])
+    # # sns.lineplot(data=weight_sc, label='weight_sc', ax=axes[1])
+    # # plot mcc learning curves
+    # sns.lineplot(data=mcc, label='train', ax=axes[2]).set(title='Matthews Correlation Coefficient')
+    # sns.lineplot(data=val_mcc, label='valid', ax=axes[2])
+
+    # plt.show()
