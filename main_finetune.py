@@ -44,4 +44,6 @@ if __name__ == "__main__":
 
     end_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    print('the time for running is',end_point-start_point)
+    print('the start point for running is',start_point)
+
+    print('the end point for running is',end_point)
