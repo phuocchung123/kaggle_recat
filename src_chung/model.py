@@ -331,7 +331,7 @@ def training(
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 20
+    n_epochs = 1
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
@@ -346,7 +346,7 @@ def training(
     best_val_loss =1e10
     best_loss=1e10
     net_contra = net
-    for epoch in range(15):
+    for epoch in range(1):
         # training
         net_contra.train()
         start_time = time.time()
@@ -382,8 +382,10 @@ def training(
 
         if np.mean(train_loss_contra_list) < best_loss:
             best_loss = np.mean(train_loss_contra_list)
-            net = net_contra
+            torch.save(net_contra.state_dict(), model_path)
     print('\n'+'*'*100)
+
+    net.load_state_dict(torch.load(model_path))
 
     for epoch in range(n_epochs):
         # training
@@ -418,7 +420,7 @@ def training(
             targets.extend(labels.tolist())
             labels = labels.to(cuda)
 
-            r_rep= net(inputs_rmol, inputs_pmol, inputs_rgmol)
+            r_rep,_,_= net(inputs_rmol, inputs_pmol, inputs_rgmol)
 
             # r_rep_contra=F.normalize(r_rep, dim=1)
             # p_rep_contra=F.normalize(p_rep, dim=1)
@@ -500,7 +502,7 @@ def training(
                     labels_val = labels_val.to(cuda)
 
 
-                    r_rep=net(inputs_rmol, inputs_pmol, inputs_rgmol)
+                    r_rep,_,_=net(inputs_rmol, inputs_pmol, inputs_rgmol)
                     pred_val = net.predict(r_rep)
                     val_preds.extend(torch.argmax(pred_val, dim=1).tolist())   
                     loss=loss_fn(pred_val,labels_val)
@@ -570,7 +572,7 @@ def inference(
                 b.to(cuda)
                 for b in batchdata[rmol_max_cnt + pmol_max_cnt : rmol_max_cnt + pmol_max_cnt + rgmol_max_cnt]
             ]
-            r_rep= net(inputs_rmol, inputs_pmol, inputs_rgmol)
+            r_rep,_,_= net(inputs_rmol, inputs_pmol, inputs_rgmol)
 
             pred = net.predict(r_rep)
 
