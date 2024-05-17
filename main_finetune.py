@@ -38,7 +38,7 @@ if __name__ == "__main__":
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print('multi_head=1,weights for combination R,P and reagents=0.7,epoch=20,dr_out=0.1,non selfattention,')
+    print('multi_head=1,weights for combination R,P and reagents=0.7,epoch=20,dr_out=0.1,nonselfattention,CONTRA')
 
     finetune(args)
 
