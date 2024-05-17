@@ -145,8 +145,8 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 1)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 1)
+        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 32)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 32)
 
     def forward(self, rmols=None, pmols=None,rgmols=None):
         if rgmols is None:
