@@ -149,7 +149,7 @@ class reactionMPNN(nn.Module):
         self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 1)
 
     def forward(self, rmols=None, pmols=None,rgmols=None):
-        if rmols is None:
+        if rgmols is None:
             r_graph_feats = [self.mpnn(mol) for mol in rmols]
             p_graph_feats = [self.mpnn(mol) for mol in pmols]
 
