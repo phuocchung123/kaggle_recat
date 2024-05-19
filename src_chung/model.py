@@ -141,12 +141,20 @@ class reactionMPNN(nn.Module):
             nn.Dropout(prob_dropout),
             nn.Linear(predict_hidden_feats, 50),
         )
+        
+        self.predict_pretrain = nn.Sequential(
+            nn.Linear(readout_feats, predict_hidden_feats),
+            nn.PReLU(),
+            nn.Dropout(prob_dropout),
+            nn.Linear(predict_hidden_feats, readout_feats),
+        )
+
         # self.batch_size=batch_size
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 1)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 1)
+        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 32)  # 注意力机制
+        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 32)
 
     def forward(self, rmols=None, pmols=None,rgmols=None):
         if rgmols is None:
@@ -364,6 +372,8 @@ def training(
             # inputs_pmol.extend(input_pmol)
         
             _,r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
+            r_rep=net_contra.predict_pretrain(r_rep)
+            p_rep=net_contra.predict_pretrain(p_rep)
             print('r_rep.shape:',r_rep.shape)
             print('p_rep.shape:',p_rep.shape)
 
