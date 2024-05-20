@@ -77,32 +77,32 @@ def finetune(args):
     else:
         pass
 
-    # # inference
-    test_y = test_loader.dataset.y
-    test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
+    # # # inference
+    # test_y = test_loader.dataset.y
+    # test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
 
-    net = reactionMPNN(node_dim, edge_dim).to("cuda")
-    net.load_state_dict(torch.load(model_path))
-    test_y_pred = inference(
-        net, test_loader,
-    )
-    # test_y_pred=torch.argmax(torch.Tensor(test_y_pred), dim=1).tolist()    
+    # net = reactionMPNN(node_dim, edge_dim).to("cuda")
+    # net.load_state_dict(torch.load(model_path))
+    # test_y_pred = inference(
+    #     net, test_loader,
+    # )
+    # # test_y_pred=torch.argmax(torch.Tensor(test_y_pred), dim=1).tolist()    
 
 
-    result = [
-        accuracy_score(test_y, test_y_pred),
-        matthews_corrcoef(test_y, test_y_pred),
-        precision_score(test_y, test_y_pred, average="macro"),
-        precision_score(test_y, test_y_pred, average="micro"),
-        recall_score(test_y, test_y_pred, average="macro"),
-        recall_score(test_y, test_y_pred, average="micro"),
-        f1_score(test_y, test_y_pred, average="macro"),
-        f1_score(test_y, test_y_pred, average="micro"),
-    ]
+    # result = [
+    #     accuracy_score(test_y, test_y_pred),
+    #     matthews_corrcoef(test_y, test_y_pred),
+    #     precision_score(test_y, test_y_pred, average="macro"),
+    #     precision_score(test_y, test_y_pred, average="micro"),
+    #     recall_score(test_y, test_y_pred, average="macro"),
+    #     recall_score(test_y, test_y_pred, average="micro"),
+    #     f1_score(test_y, test_y_pred, average="macro"),
+    #     f1_score(test_y, test_y_pred, average="micro"),
+    # ]
 
-    print("-- RESULT")
-    print("--- test size: %d" % (len(test_y)))
-    print(
-        "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f"
-        % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7])
-    )
+    # print("-- RESULT")
+    # print("--- test size: %d" % (len(test_y)))
+    # print(
+    #     "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f"
+    #     % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7])
+    # )

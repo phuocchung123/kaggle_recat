@@ -401,6 +401,7 @@ def training(
 
     for epoch in range(n_epochs):
         # training
+        break
 
         net.train()
         start_time = time.time()
@@ -547,7 +548,7 @@ def training(
             torch.save(net.state_dict(), model_path)
 
 
-    print("training terminated at epoch %d" % epoch)
+    # print("training terminated at epoch %d" % epoch)
 
     return net
 
