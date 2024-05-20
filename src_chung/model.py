@@ -374,8 +374,8 @@ def training(
             _,r_rep,p_rep= net_contra(inputs_rmol, inputs_pmol)
             r_rep=net_contra.predict_pretrain(r_rep)
             p_rep=net_contra.predict_pretrain(p_rep)
-            print('r_rep.shape:',r_rep.shape)
-            print('p_rep.shape:',p_rep.shape)
+            # print('r_rep.shape:',r_rep.shape)
+            # print('p_rep.shape:',p_rep.shape)
 
             r_rep=F.normalize(r_rep, dim=1)
             p_rep=F.normalize(p_rep, dim=1)
