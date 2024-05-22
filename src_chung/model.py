@@ -397,7 +397,7 @@ def training(
             torch.save(net_contra.state_dict(), model_path)
     print('\n'+'*'*100)
 
-    net.load_my_state_dict(torch.load(model_path,map_location='cuda:0'))
+    net.load_state_dict(torch.load(model_path,map_location='cuda:0'))
 
     for epoch in range(n_epochs):
         # training
