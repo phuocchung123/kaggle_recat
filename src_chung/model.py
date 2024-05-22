@@ -339,7 +339,7 @@ def training(
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 20
+    n_epochs = 2
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
@@ -354,7 +354,7 @@ def training(
     best_val_loss =1e10
     best_loss=1e10
     net_contra = net
-    for epoch in range(15):
+    for epoch in range(2):
         # training
         net_contra.train()
         start_time = time.time()
@@ -397,11 +397,10 @@ def training(
             torch.save(net_contra.state_dict(), model_path)
     print('\n'+'*'*100)
 
-    net.load_state_dict(torch.load(model_path))
+    net.load_my_state_dict(torch.load(model_path,map_location='cuda:0'))
 
     for epoch in range(n_epochs):
         # training
-        break
 
         net.train()
         start_time = time.time()
