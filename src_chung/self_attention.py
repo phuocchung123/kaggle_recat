@@ -110,4 +110,5 @@ class EncoderLayer(nn.Module):
         y = self.ffn(y)
         y = self.ffn_dropout(y)
         x = x + y
+        x=self.ffn_norm(x)
         return x,y_att
