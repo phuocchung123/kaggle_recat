@@ -21,7 +21,7 @@ def finetune(args):
 
     batch_size = 32
     use_saved = False
-    model_path = "kaggle/working/sample/data_chung/model/finetuned/model.pt"
+    model_path = "/kaggle/working/sample/data_chung/model/finetuned/model.pt"
 
     train_set = GraphDataset('/kaggle/input/data-tpl/data_train_tpl.npz')
 
