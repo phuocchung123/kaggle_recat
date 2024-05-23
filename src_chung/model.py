@@ -210,8 +210,8 @@ class reactionMPNN(nn.Module):
                 reactants_noncross=reactants
                 reactants,att_r=self.rea_attention_pro(reactants, products)
                 products,att_p=self.pro_attention_rea(products, reactants_noncross)
-                reactants=torch.sum(reactants,0).unsqueeze(0)
-                products= torch.sum(products,0).unsqueeze(0)
+                reactants=torch.mean(reactants,0).unsqueeze(0)
+                products= torch.mean(products,0).unsqueeze(0)
 
                 reaction_feat=torch.sub(reactants,products)
 
@@ -276,8 +276,8 @@ class reactionMPNN(nn.Module):
                 reactants_noncross=reactants
                 reactants,att_r=self.rea_attention_pro(reactants, products)
                 products,att_p=self.pro_attention_rea(products, reactants_noncross)
-                reactants=torch.sum(reactants,0).unsqueeze(0)
-                products= torch.sum(products,0).unsqueeze(0)
+                reactants=torch.mean(reactants,0).unsqueeze(0)
+                products= torch.mean(products,0).unsqueeze(0)
 
                 reaction_feat=torch.sub(reactants,products)
 
@@ -339,7 +339,7 @@ def training(
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 2
+    n_epochs = 50
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
