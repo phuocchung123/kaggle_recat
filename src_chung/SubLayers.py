@@ -30,9 +30,9 @@ class MultiHeadAttention(nn.Module):
     def forward(self, q, k, v, mask=None):
 
         d_k, d_v, n_head = self.d_k, self.d_v, self.n_head
-        print('q:', q.size(), 'k:', k.size(), 'v:', v.size())
+        # print('q:', q.size(), 'k:', k.size(), 'v:', v.size())
         len_q, len_k, len_v = q.size(0), k.size(0), v.size(0)
-        print('q:', q.size(), 'k:', k.size(), 'v:', v.size())
+        # print('q:', q.size(), 'k:', k.size(), 'v:', v.size())
         sz_b=1
         
 
@@ -54,7 +54,7 @@ class MultiHeadAttention(nn.Module):
 
         # Transpose to move the head dimension back: b x lq x n x dv
         # Combine the last two dimensions to concatenate all the heads together: b x lq x (n*dv)
-        q = q.transpose(1, 2).contiguous().view(sz_b, len_q, -1)
+        q = q.transpose(1, 2).contiguous().view(len_q, -1)
         q = self.dropout(self.fc(q))
         q += residual
 
