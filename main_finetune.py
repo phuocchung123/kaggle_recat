@@ -39,6 +39,7 @@ if __name__ == "__main__":
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print('Selfattention,multi_head=8, epoch=20, dim_inner=2048,d_k=64,d_v=64')
+    print('commit: modify SubLayer.py because self attention for each reaction not for batch')
 
     finetune(args)
 
