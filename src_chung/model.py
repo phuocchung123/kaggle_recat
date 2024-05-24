@@ -7,14 +7,13 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import MultiStepLR
 from dgl.nn.pytorch import GINEConv
 from dgl.nn.pytorch.glob import SumPooling, AvgPooling
-from Layers import EncoderLayer
 from sklearn.metrics import accuracy_score, matthews_corrcoef
 import seaborn as sns
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 # from util import MC_dropout
-from src_chung.self_attention import EncoderLayer
+from src_chung.Layers import EncoderLayer
 from src_chung.nt_xent import NTXentLoss
 
 
