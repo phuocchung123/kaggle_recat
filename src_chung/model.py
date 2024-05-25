@@ -156,7 +156,7 @@ class reactionMPNN(nn.Module):
         #self attention
         self.layer_stack = nn.ModuleList([
             EncoderLayer(d_model=300, d_inner=2048, n_head=8, d_k=64, d_v=64, dropout=0.1)
-            for _ in range(6)])
+            for _ in range(1)])
         
         self.return_attns=return_attns
 
