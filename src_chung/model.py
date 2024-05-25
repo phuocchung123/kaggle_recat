@@ -207,15 +207,22 @@ class reactionMPNN(nn.Module):
                 products=torch.cat((products, product))
 
             start_list_p=end_list_p
-            reaction_feat=torch.cat((reactants, products))
+            # reaction_feat=torch.cat((reactants, products))
 
             reaction_attn_list=[]
 
             for enc_layer in self.layer_stack:
-                reaction_feat, reaction_attn = enc_layer(reaction_feat)
-                reaction_attn_list += [reaction_attn] if self.return_attns else []
+                reactants, reactant_attn = enc_layer(reactants, products)
+                reaction_attn_list += [reactant_attn] if self.return_attns else []
 
-            reaction_feat=torch.sum(reaction_feat,0).unsqueeze(0)
+            for enc_layer in self.layer_stack:
+                products, product_attn = enc_layer(products, reactants)
+                reaction_attn_list += [product_attn] if self.return_attns else []
+            
+            reactants=torch.sum(reactants, 0).unsqueeze(0)
+            products=torch.sum(products, 0).unsqueeze(0)
+            reaction_feat=torch.sub(reactants, products)
+            # reaction_feat=torch.sum(reaction_feat,0).unsqueeze(0)
 
 
             #reagents
