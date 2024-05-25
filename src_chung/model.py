@@ -211,13 +211,13 @@ class reactionMPNN(nn.Module):
 
             reaction_attn_list=[]
 
-            for enc_layer in self.layer_stack:
-                reactants, reactant_attn = enc_layer(reactants, products)
-                reaction_attn_list += [reactant_attn] if self.return_attns else []
+            # for enc_layer in self.layer_stack:
+            #     reactants, reactant_attn = enc_layer(reactants, products)
+            #     reaction_attn_list += [reactant_attn] if self.return_attns else []
 
-            for enc_layer in self.layer_stack:
-                products, product_attn = enc_layer(products, reactants)
-                reaction_attn_list += [product_attn] if self.return_attns else []
+            # for enc_layer in self.layer_stack:
+            #     products, product_attn = enc_layer(products, reactants)
+            #     reaction_attn_list += [product_attn] if self.return_attns else []
             
             reactants=torch.sum(reactants, 0).unsqueeze(0)
             products=torch.sum(products, 0).unsqueeze(0)

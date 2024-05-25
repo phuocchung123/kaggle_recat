@@ -38,7 +38,7 @@ if __name__ == "__main__":
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print('crossattention, numlayer=1,multi_head=8, epoch=50, dim_inner=2048,d_k=64,d_v=64')
+    print('justGIN, numlayer=1,multi_head=8, epoch=50, dim_inner=2048,d_k=64,d_v=64')
     print('commit: modify SubLayer.py because self attention for each reaction not for batch')
 
     finetune(args)
