@@ -38,7 +38,7 @@ if __name__ == "__main__":
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print('multi_head=2,epoch=20,dr_out=0.1, testcsv anhLong')
+    print('UCNM, just GIN')
 
     finetune(args)
 
