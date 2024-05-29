@@ -23,7 +23,7 @@ def finetune(args):
     use_saved = False
     model_path = "/kaggle/working/sample/data_chung/model/finetuned/model.pt"
 
-    train_set = GraphDataset(args.graph_save_path+'data_train_nonreagent.npz')
+    train_set = GraphDataset(args.graph_save_path+'data_train_ucnm.npz')
 
     train_loader = DataLoader(
         dataset=train_set,
@@ -33,7 +33,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    valid_set = GraphDataset(args.graph_save_path+'data_valid_nonreagent.npz')
+    valid_set = GraphDataset(args.graph_save_path+'data_valid_ucnm.npz')
 
     val_loader = DataLoader(
         dataset=valid_set,
@@ -43,7 +43,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    test_set=GraphDataset(args.graph_save_path+'data_test_nonreagent.npz')
+    test_set=GraphDataset(args.graph_save_path+'data_test_ucnm.npz')
     test_loader = DataLoader(
         dataset=test_set,
         batch_size=batch_size,
@@ -81,7 +81,7 @@ def finetune(args):
 
     # # inference
     test_y = test_loader.dataset.y
-    # test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
+    test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
 
     net = reactionMPNN(node_dim, edge_dim).to('cuda')
     net.load_state_dict(torch.load(model_path))
@@ -100,14 +100,13 @@ def finetune(args):
         recall_score(test_y, test_y_pred, average="micro"),
         f1_score(test_y, test_y_pred, average="macro"),
         f1_score(test_y, test_y_pred, average="micro"),
-        f1_score(test_y, test_y_pred, average="binary"),
     ]
 
     print("-- RESULT")
     print("--- test size: %d" % (len(test_y)))
     print(
         "--- Accuracy: %.3f, Mattews Correlation: %.3f,\n precision_macro: %.3f, precision_micro: %.3f,\n recall_macro: %.3f, recall_micro: %.3f,\n f1_macro: %.3f, f1_micro: %.3f,f1_binary: %.3f"
-        % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7],result[8])
+        % (result[0], result[1],result[2],result[3],result[4],result[5],result[6],result[7])
     )
 
     # sns.set()

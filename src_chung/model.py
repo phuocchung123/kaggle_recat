@@ -139,15 +139,15 @@ class reactionMPNN(nn.Module):
             nn.Linear(predict_hidden_feats, predict_hidden_feats),
             nn.PReLU(),
             nn.Dropout(prob_dropout),
-            nn.Linear(predict_hidden_feats, 1),
+            nn.Linear(predict_hidden_feats, 115),
             nn.Sigmoid(),
         )
         # self.batch_size=batch_size
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 2)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 2)
+        # self.rea_attention_pro = EncoderLayer(300,128, 0.1, 0.1, 2)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(300,128, 0.1, 0.1, 2)
 
     def forward(self, rmols, pmols):
         r_graph_feats = [self.mpnn(mol) for mol in rmols]
@@ -236,7 +236,7 @@ def training(
         pmol_max_cnt = train_loader.dataset.pmol_max_cnt
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
-    loss_fn = nn.BCELoss()
+    loss_fn = nn.CrossEntropyLoss()
     n_epochs = 20
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
@@ -330,9 +330,9 @@ def training(
 
             # print('labels',labels.shape)
 
-            pred = net.predict(r_rep).squeeze()
+            pred = net.predict(r_rep)
             # print('pred',pred.shape)
-            preds.extend(pred.round().cpu().detach().numpy().tolist())
+            preds.extend(torch.argmax(pred,dim=1).tolist())
             loss= loss_fn(pred, labels)
 
 
@@ -403,8 +403,8 @@ def training(
 
 
                     r_rep=net(inputs_rmol, inputs_pmol)
-                    pred_val = net.predict(r_rep).squeeze()
-                    val_preds.extend(pred_val.round().cpu().numpy().tolist())   
+                    pred_val = net.predict(r_rep)
+                    val_preds.extend(torch.argmax(pred_val,dim=1).tolist())   
                     loss=loss_fn(pred_val,labels_val)
 
 
@@ -469,11 +469,11 @@ def inference(
 
             r_rep= net(inputs_rmol, inputs_pmol)
 
-            pred = net.predict(r_rep).squeeze()
+            pred = net.predict(r_rep)
 
 
             # pred_y.extend(torch.argmax(pred,dim=1).tolist())
-            pred_y.extend(pred.round().cpu().numpy().tolist())  
+            pred_y.extend(torch.argmax(pred,dim=1).tolist())  
 
 
     return pred_y
