@@ -153,8 +153,8 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,2048, 0.1, 0.1, 8)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,2048, 0.1, 0.1, 8)
+        # self.rea_attention_pro = EncoderLayer(300,2048, 0.1, 0.1, 8)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(300,2048, 0.1, 0.1, 8)
 
     def forward(self, rmols=None, pmols=None,rgmols=None):
         if rgmols is None:
@@ -207,9 +207,9 @@ class reactionMPNN(nn.Module):
                 # reactants,_=self.rea_attention_pro(reactants, reactants)
                 # products,_=self.pro_attention_rea(products,products)
 
-                reactants_noncross=reactants
-                reactants,att_r=self.rea_attention_pro(reactants, products)
-                products,att_p=self.pro_attention_rea(products, reactants_noncross)
+                # reactants_noncross=reactants
+                # reactants,att_r=self.rea_attention_pro(reactants, products)
+                # products,att_p=self.pro_attention_rea(products, reactants_noncross)
                 reactants=torch.sum(reactants,0).unsqueeze(0)
                 products= torch.sum(products,0).unsqueeze(0)
 
@@ -273,9 +273,9 @@ class reactionMPNN(nn.Module):
                 # reactants,_=self.rea_attention_pro(reactants, reactants)
                 # products,_=self.pro_attention_rea(products,products)
 
-                reactants_noncross=reactants
-                reactants,att_r=self.rea_attention_pro(reactants, products)
-                products,att_p=self.pro_attention_rea(products, reactants_noncross)
+                # reactants_noncross=reactants
+                # reactants,att_r=self.rea_attention_pro(reactants, products)
+                # products,att_p=self.pro_attention_rea(products, reactants_noncross)
                 reactants=torch.sum(reactants,0).unsqueeze(0)
                 products= torch.sum(products,0).unsqueeze(0)
 
