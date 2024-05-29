@@ -134,7 +134,7 @@ class reactionMPNN(nn.Module):
             nn.Linear(predict_hidden_feats, predict_hidden_feats),
             nn.PReLU(),
             nn.Dropout(prob_dropout),
-            nn.Linear(predict_hidden_feats, 115),
+            nn.Linear(predict_hidden_feats, 50),
         )
 
         # Cross-Attention Module
