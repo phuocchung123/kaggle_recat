@@ -21,7 +21,7 @@ def finetune(args):
     use_saved = False
     model_path = "/kaggle/working/sample/data_chung/model/finetuned/model.pt"
 
-    train_set = GraphDataset(args.graph_save_path+'data_train_uc.npz')
+    train_set = GraphDataset(args.graph_save_path+'data_train_uc(2).npz')
 
     train_loader = DataLoader(
         dataset=train_set,
@@ -31,7 +31,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    valid_set = GraphDataset(args.graph_save_path+'data_valid_uc.npz')
+    valid_set = GraphDataset(args.graph_save_path+'data_valid_uc(2).npz')
 
     val_loader = DataLoader(
         dataset=valid_set,
@@ -41,7 +41,7 @@ def finetune(args):
         drop_last=True,
     )
 
-    test_set=GraphDataset(args.graph_save_path+'data_test_uc.npz')
+    test_set=GraphDataset(args.graph_save_path+'data_test_uc(2).npz')
     test_loader = DataLoader(
         dataset=test_set,
         batch_size=batch_size,
