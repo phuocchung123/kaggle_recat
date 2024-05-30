@@ -38,7 +38,7 @@ if __name__ == "__main__":
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print('multi_head=8,weights for combination R,P and reagents=0.7,epoch=20,sum,dim_inner=2048')
+    print('JUST GIN, reaction_feat=reaction_feat*weight+ reagents*(1-0.1-weight) + 0.1*reaction_mean ,epoch=20')
 
     finetune(args)
 

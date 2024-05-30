@@ -153,8 +153,8 @@ class reactionMPNN(nn.Module):
         self.cuda=cuda
 
         # Cross-Attention Module
-        self.rea_attention_pro = EncoderLayer(300,2048, 0.1, 0.1, 8)  # 注意力机制
-        self.pro_attention_rea = EncoderLayer(300,2048, 0.1, 0.1, 8)
+        # self.rea_attention_pro = EncoderLayer(300,2048, 0.1, 0.1, 8)  # 注意力机制
+        # self.pro_attention_rea = EncoderLayer(300,2048, 0.1, 0.1, 8)
 
     def forward(self, rmols=None, pmols=None,rgmols=None):
         if rgmols is None:
@@ -207,9 +207,10 @@ class reactionMPNN(nn.Module):
                 # reactants,_=self.rea_attention_pro(reactants, reactants)
                 # products,_=self.pro_attention_rea(products,products)
 
-                reactants_noncross=reactants
-                reactants,att_r=self.rea_attention_pro(reactants, products)
-                products,att_p=self.pro_attention_rea(products, reactants_noncross)
+                # reactants_noncross=reactants
+                # reactants,att_r=self.rea_attention_pro(reactants, products)
+                # products,att_p=self.pro_attention_rea(products, reactants_noncross)
+
                 reactants=torch.sum(reactants,0).unsqueeze(0)
                 products= torch.sum(products,0).unsqueeze(0)
 
@@ -273,9 +274,12 @@ class reactionMPNN(nn.Module):
                 # reactants,_=self.rea_attention_pro(reactants, reactants)
                 # products,_=self.pro_attention_rea(products,products)
 
-                reactants_noncross=reactants
-                reactants,att_r=self.rea_attention_pro(reactants, products)
-                products,att_p=self.pro_attention_rea(products, reactants_noncross)
+                # reactants_noncross=reactants
+                # reactants,att_r=self.rea_attention_pro(reactants, products)
+                # products,att_p=self.pro_attention_rea(products, reactants_noncross)
+
+                reaction_cat=torch.cat((reactants, products))
+                reaction_mean=torch.mean(reaction_cat, 0).unsqueeze(0)
                 reactants=torch.sum(reactants,0).unsqueeze(0)
                 products= torch.sum(products,0).unsqueeze(0)
 
@@ -301,7 +305,7 @@ class reactionMPNN(nn.Module):
                 weight=0.7
 
 
-                reaction_feat=reaction_feat*weight+ reagents*(1-weight)
+                reaction_feat=reaction_feat*weight+ reagents*(1-0.1-weight) + 0.1*reaction_mean
 
                 reaction_feat_full=torch.cat((reaction_feat_full, reaction_feat))
                 reactants_out=torch.cat((reactants_out, reactants))
