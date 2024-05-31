@@ -302,10 +302,10 @@ class reactionMPNN(nn.Module):
 
                 # weight=0.5*torch.rand(1) +0.5
                 # weight=weight.item()
-                weight=0.7
+                weight=0.6
 
 
-                reaction_feat=reaction_feat*weight+ reagents*(1-0.1-weight) + 0.1*reaction_mean
+                reaction_feat=reaction_feat*weight+ reagents*(1-0.2-weight) + 0.2*reaction_mean
 
                 reaction_feat_full=torch.cat((reaction_feat_full, reaction_feat))
                 reactants_out=torch.cat((reactants_out, reactants))
