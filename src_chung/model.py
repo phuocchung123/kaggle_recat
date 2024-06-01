@@ -35,7 +35,7 @@ class GIN(nn.Module):
         self,
         node_in_feats,
         edge_in_feats,
-        depth=3,
+        depth=6,
         node_hid_feats=300,
         readout_feats=1024,
         dr=0.1,
@@ -343,7 +343,7 @@ def training(
     # print('rmol_max_cnt:', rmol_max_cnt, '\n pmol_max_cnt:', pmol_max_cnt)
 
     loss_fn = nn.CrossEntropyLoss()
-    n_epochs = 20
+    n_epochs = 40
     optimizer = Adam(net.parameters(), lr=5e-4, weight_decay=1e-5)
 
 
