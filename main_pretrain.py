@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # The full dataset (10M mols collected from Pubchem) can be downloaded from
     # https://arxiv.org/pdf/2010.09885.pdf
     molsuppl = Chem.SmilesMolSupplier(
-        "/kaggle/input/data_pubchem/pubchem-10m.txt", delimiter=","
+        "/kaggle/input/data-pubchem/pubchem-10m.txt", delimiter=","
     )
 
     if not os.path.exists(args.pretrain_graph_save_path + "pubchem_graph.npz"):
