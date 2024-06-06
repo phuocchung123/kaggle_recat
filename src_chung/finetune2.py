@@ -72,9 +72,11 @@ def finetune(args):
     node_dim = train_set.rmol_node_attr[0].shape[1]
     edge_dim = train_set.rmol_edge_attr[0].shape[1]
 
-    pretrained_model_path = "kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
+    # pretrained_model_path = "kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
 
-    net = reactionMPNN(node_dim, edge_dim,pretrained_model_path).to('cuda')
+    net = reactionMPNN(node_dim, edge_dim).to('cuda')
+    net.load_state_dict(torch.load('./data_chung/model/finetuned/model.pt'))
+    
 
     if use_saved == False:
         print("-- TRAINING")
@@ -88,7 +90,7 @@ def finetune(args):
     test_y=torch.argmax(torch.Tensor(test_y), dim=1).tolist()
 
     net = reactionMPNN(node_dim, edge_dim).to('cuda')
-    net.load_state_dict(torch.load(model_path,map_location='cuda:0'))
+    net.load_state_dict(torch.load(model_path))
     test_y_pred = inference(
         net, test_loader,
     )

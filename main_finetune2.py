@@ -7,7 +7,7 @@ import torch
 from rdkit import rdBase
 
 from src_chung.get_reaction_data import get_graph_data
-from src_chung.finetune import finetune
+from src_chung.finetune2 import finetune
 import warnings
 import datetime
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         os.makedirs("/kaggle/working/sample/data_chung/model/finetuned/")
 
     start_point=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print('TPL_Data, Just GIN, 7:3, 4 epoch')
+    print('TPL_Data, Just GIN, 7:3, 4 epoch CONTINUE')
 
     finetune(args)
 
