@@ -72,7 +72,6 @@ def finetune(args):
     node_dim = train_set.rmol_node_attr[0].shape[1]
     edge_dim = train_set.rmol_edge_attr[0].shape[1]
 
-    # pretrained_model_path = "kaggle/working/sample/model/pretrained/" + "27407_pretrained_gnn.pt" 
 
     net = reactionMPNN(node_dim, edge_dim).to('cuda')
     net.load_state_dict(torch.load('./data_chung/model/finetuned/model.pt'))
